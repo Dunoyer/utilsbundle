@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace FOPG\Component\UtilsBundle;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
