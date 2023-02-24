@@ -50,11 +50,13 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
 
     /**
      * @param string $html
+     * @return \DOMDocumentFragment
      */
-    private function get_fragment(string $html)
+    private function get_fragment(string $html): \DOMDocumentFragment
     {
         $dom = $this->getDoc()->getDom();
         $fragment = $dom->createDocumentFragment() or die('nope');
+        $html = str_replace("&", "&amp;", $html);
         $fragment->appendXML($html);
         return $fragment;
     }
@@ -66,14 +68,14 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
         return $node;
     }
 
-    public function before($html)
+    public function before(string $html): self
     {
         $fragment = $this->get_fragment($html);
         $this->getNode()->parentNode->insertBefore($fragment, $this->getNode());
-        return new SimpleHtmlNode($this->getNode()->previousSibling, $this->getDoc());
+        return $this;
     }
 
-    public function after($html)
+    public function after(string $html): self
     {
         $fragment = $this->get_fragment($html);
         if($ref_node = $this->getNode()->nextSibling)
@@ -84,6 +86,7 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
         {
             $this->getNode()->parentNode->appendChild($fragment);
         }
+        return $this;
     }
 
     public function decamelize($str)

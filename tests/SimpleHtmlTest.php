@@ -25,9 +25,30 @@ class SimpleHtmlTest extends TestCase
 
         $h1->before('<span>test</span>');
 
+
         $this->compareTo($dom->find('body')->html(), "<body><span>test</span><h1>nothing</h1></body>", 'OK', 'KO');
 
+        $this->iteration("Insertion d'une balise 'div' après la balise 'h1'");
+
+        $h1->after('<div id="ab">test</div>');
+
+        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div></body>', 'OK', 'KO');
+        unset($h1);
+
+        $this->iteration("Insertion d'un texte après après la balise 'div'");
+
+        $div = $dom->find('div')[0];
+        $div->after('ainsi >');
+
+        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>ainsi &gt;</body>', 'OK', 'KO');
+
+        $this->iteration('Gestion du "&" lors des manipulations dans le texte');
+
+        $div->after("xxx&xxx");
+
+        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
     }
+
     public function testRetrieving(): void
     {
         $this->section(self::SECTION_HEADER.' Validation sur la récupération des informations du DOM');
