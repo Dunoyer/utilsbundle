@@ -261,8 +261,14 @@ class SimpleHtmlBase
     }
   }
 
+  public function getFirstChild(): string
+  {
+    return $this->firstchild();
+  }
+  
   // magic methods
   public function __call($key, $args){
+
     $key = strtolower(str_replace('_', '', $key));
     switch($key){
       case 'innertext': return ($this->getIsText() || !$this->children->length) ? $this->text() : $this->find('./text()|./*')->outertext ;

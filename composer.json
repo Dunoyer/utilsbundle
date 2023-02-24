@@ -1,5 +1,14 @@
 {
-    "type": "project",
+    "name": "friend-of-pastry-garden/utils-bundle",
+    "type": "library",
+    "description": "Fourniture d'outils d'aide au développement",
+    "keywords": ["SimpleHtml"],
+    "authors": [
+      {
+        "name": "Yannick ROUSSEL",
+        "email": "yanroussel@gmail.com"
+      }
+    ],
     "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,

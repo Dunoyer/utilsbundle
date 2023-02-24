@@ -47,6 +47,18 @@ class SimpleHtmlTest extends TestCase
         $div->after("xxx&xxx");
 
         $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
+
+        $this->iteration("Remplacement de la balise 'div' par la balise 'h5'");
+
+        $div->replace("<h5>TAC</h5>");
+
+        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><h5>TAC</h5>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
+
+        $this->iteration("Suppression des balises 'span'");
+
+        $dom->find('span')->remove();
+
+        $this->compareTo($dom->find('body')->html(), '<body><h1>nothing</h1><h5>TAC</h5>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
     }
 
     public function testRetrieving(): void
@@ -73,5 +85,16 @@ class SimpleHtmlTest extends TestCase
 
         $this->compareTo((count($nodeList) === 1) && ($nodeList[0]->text() ==='testahlalallalalalal'),true,'OK','KO');
 
+        $this->iteration("Récupération des attributs du noeud d'id 'none'");
+
+        $div = $dom->find('[@id=none]')[0];
+
+        $this->compareTo($div->attributes(),['id' => 'none', 'class' => 'article master'],'OK','KO');
+
+        $this->iteration("Récupération du contenu de la première balise 'div'");
+        /** @var string $firstDiv */
+        $firstDiv = $dom->find('div')->getFirstChild();
+
+        $this->compareTo($firstDiv,'<h1 id="test">Ceci est un test</h1>','OK','KO');
     }
 }

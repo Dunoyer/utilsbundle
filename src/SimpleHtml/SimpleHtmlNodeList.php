@@ -7,23 +7,23 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
     /**
      * @var \DOMNodeList
      */
-    private $_nodeList;
+    private ?\DOMNodeList $_nodeList = null;
 
     /**
      * @var \FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase
      */
-    private $_doc;
+    private ?SimpleHtmlBase $_doc = null;
 
     /**
      * @var int
      */
-    private $_counter = 0;
+    private int $_counter = 0;
 
     /**
      * @param \DOMNodeList $nodeList
      * @return \FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlNodeList
      */
-    public function setNodeList(\DOMNodeList $nodeList)
+    public function setNodeList(\DOMNodeList $nodeList): self
     {
         $this->_nodeList = $nodeList;
 
@@ -33,7 +33,7 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
     /**
      * @return \DOMNodeList
      */
-    public function getNodeList()
+    public function getNodeList(): ?\DOMNodeList
     {
         return $this->_nodeList;
     }
@@ -41,7 +41,7 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
     /**
      * @return int
      */
-    public function getCounter()
+    public function getCounter(): int
     {
         return $this->_counter;
     }
@@ -50,7 +50,7 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
      * @param \FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase $doc
      * @return \FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlNodeList
      */
-    public function setDoc(SimpleHtmlBase $doc)
+    public function setDoc(SimpleHtmlBase $doc): self
     {
         $this->_doc = $doc;
 
@@ -60,7 +60,7 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
     /**
      * @return \FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase
      */
-    public function getDoc()
+    public function getDoc(): ?SimpleHtmlBase
     {
         return $this->_doc;
     }

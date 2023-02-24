@@ -95,9 +95,9 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
         return preg_replace('/ /', '_', strtolower($str));
     }
 
-    public function attributes()
+    public function attributes(): array
     {
-        $ret = array();
+        $ret = [];
         foreach($this->getNode()->attributes as $attr)
         {
             $ret[$attr->nodeName] = $attr->nodeValue;
