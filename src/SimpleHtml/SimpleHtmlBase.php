@@ -104,19 +104,19 @@ class SimpleHtmlBase
       return $this->is_text;
   }
 
-  public function text()
+  public function getText()
   {
       return $this->getNode()->nodeValue;
   }
 
-  public function html(): ?string
+  public function getHtml(): ?string
   {
       return $this->getDoc()->getDom()->saveHTML($this->getNode());
   }
 
   public function __toString()
   {
-      return $this->html();
+      return $this->getHtml();
   }
 
   public static function cleanupXpatWithIdAndClass(string $xpath): string
@@ -136,7 +136,7 @@ class SimpleHtmlBase
   public function getTextRate(string $selector, bool $withClasses=true, float $minRate=.5, int $minSize=20, string $excludeSelectors=''): array
   {
     $output = [];
-    $nodeList = $this->find($selector);
+    $nodeList = $this->findAll($selector);
     foreach($nodeList as $node) {
       $html = $node->html();
       $htmlRestricted = preg_replace("/<(\w+)([^>]*)>/i","<$1>", $html);
@@ -224,54 +224,46 @@ class SimpleHtmlBase
   public function clean($str){ return trim(preg_replace('/\s+/', ' ', $str)); }
   public function trim($str){ return trim($str); }
 
+  public function findAll(string $css): ?SimpleHtmlNodeList
+  {
+    $xpath =  SimpleHtmlCSS::xpath_for($css);
+    $doc = $this->getDoc() ?? null;
+    $nxpath = $doc ? $doc->getXpath() : null;
+    return $nxpath ? new SimpleHtmlNodeList($nxpath->query($xpath, $this->getNode()), $this->getDoc()) : null;
+  }
   /**
    * Find nodes with xpath expressions
    *
    * @param string $css
-   * @param $index
-   * @return
+   * @param int $index
+   * @return ?SimpleHtmlNode
    */
-  public function find($css, $index = null){
-
-    $xpath =  SimpleHtmlCSS::xpath_for($css);
-
-    $doc = $this->getDoc();
-    if(empty($doc))
-    {
-        return null;
-    }
-
-    $nxpath = $doc->getXpath();
-
-    if(empty($nxpath))
-    {
-        return null;
-    }
-
-    if(null === $index)
-    {
-      return new SimpleHtmlNodeList($nxpath->query($xpath, $this->getNode()), $this->getDoc());
-    }
-    else
+  public function findOne(string $css, int $index): ?SimpleHtmlNode {
+    $xpath  =  SimpleHtmlCSS::xpath_for($css);
+    $doc    = $this->getDoc() ?? null;
+    $nxpath = $doc ? $doc->getXpath() : null;
+    $node   = null;
+    if(null !== $nxpath)
     {
       $nl = $nxpath->query($xpath, $this->getNode());
-      if($index < 0) $index = $nl->length + $index;
+      if($index < 0)
+        $index = $nl->length + $index;
       $node = $nl->item($index);
-      return $node ? new SimpleHtmlNode($node, $this->getDoc()) : null;
     }
+    return $node ? new SimpleHtmlNode($node, $this->getDoc()) : null;
   }
 
-  public function innertext(): ?string
+  public function getInnertext(): ?string
   {
-    return ($this->getIsText() || !$this->children->length) ? $this->text() : $this->find('./text()|./*')->text;
+    return ($this->getIsText() || !$this->children->length) ? $this->getText() : $this->findAll('./text()|./*')->getText();
   }
 
-  public function firstchild(): ?string
+  public function getFirstChild(): ?string
   {
     return $this->at('> *');
   }
 
-  public function lastchild(): ?string
+  public function getLastChild(): ?string
   {
     return $this->at('> *:last');
   }
@@ -281,10 +273,9 @@ class SimpleHtmlBase
     $key = strtolower(str_replace('_', '', $key));
     switch($key){
       case 'plaintext':
-        return $this->text();
-      case 'html':
+        return $this->getText();
       case 'save':
-         return $this->html();
+         return $this->getHtml();
       case 'innerhtml':
         $ret = '';
         foreach($this->getNode()->childNodes as $child) $ret .= $this->getDoc()->getDom()->saveHTML($child);
@@ -307,14 +298,14 @@ class SimpleHtmlBase
       // search functions
       case 'at':
       case 'getelementbytagname':
-        return $this->find($args[0], 0);
+        return $this->findOne($args[0], 0);
 
       case 'search':
       case 'getelementsbytagname':
-        return isset($args[1]) ? $this->find($args[0], $args[1]) : $this->find($args[0]);
+        return isset($args[1]) ? $this->findOne($args[0], $args[1]) : $this->findAll($args[0]);
 
-      case 'getelementbyid': return $this->find('#' . $args[0], 0);
-      case 'getelementsbyid': return isset($args[1]) ? $this->find('#' . $args[0], $args[1]) : $this->find('#' . $args[0]);
+      case 'getelementbyid': return $this->findOne('#' . $args[0], 0);
+      case 'getelementsbyid': return isset($args[1]) ? $this->findOne('#' . $args[0], $args[1]) : $this->findAll('#' . $args[0]);
 
       // attributes
       case 'hasattribute': return !$this->getIsText() && $this->getNode()->hasAttribute($args[0]);
@@ -351,9 +342,8 @@ class SimpleHtmlBase
 
     }
 
-    // $doc->spans[x]
-    if(preg_match(self::TAGS_REGEX, $key, $m)) return $this->find($m[1]);
-    if(preg_match(self::TAG_REGEX, $key, $m)) return $this->find($m[1], 0);
+    if(preg_match(self::TAGS_REGEX, $key, $m)) return $this->findAll($m[1]);
+    if(preg_match(self::TAG_REGEX, $key, $m)) return $this->findOne($m[1], 0);
 
     if(preg_match('/(clean|trim|str)(.*)/', $key, $m) && isset($m[2])){
       $arg1 = $m[1];

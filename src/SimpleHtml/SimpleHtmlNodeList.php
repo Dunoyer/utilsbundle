@@ -31,6 +31,18 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
     }
 
     /**
+     * @return ?string
+     */
+    public function getText(): ?string
+    {
+      $str = null;
+      /** @var \DOMElement $element */
+      foreach($this->_nodeList as $element)
+        $str.=$element->nodeValue;
+      return $str;
+    }
+
+    /**
      * @return \DOMNodeList
      */
     public function getNodeList(): ?\DOMNodeList

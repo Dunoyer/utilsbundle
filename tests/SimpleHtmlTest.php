@@ -17,7 +17,7 @@ class SimpleHtmlTest extends TestCase
         /** @var SimpleHtmlDom $dom */
         $dom = SimpleHtml::str_get_html($html)->getContainer();
         /** @var SimpleHtmlNodeList $h1s */
-        $h1s = $dom->find('h1');
+        $h1s = $dom->findAll('h1');
         /** @var SimpleHtmlNode $h1 */
         $h1 = $h1s[0];
 
@@ -26,39 +26,39 @@ class SimpleHtmlTest extends TestCase
         $h1->before('<span>test</span>');
 
 
-        $this->compareTo($dom->find('body')->html(), "<body><span>test</span><h1>nothing</h1></body>", 'OK', 'KO');
+        $this->compareTo($dom->findAll('body')->getHtml(), "<body><span>test</span><h1>nothing</h1></body>", 'OK', 'KO');
 
         $this->iteration("Insertion d'une balise 'div' après la balise 'h1'");
 
         $h1->after('<div id="ab">test</div>');
 
-        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div></body>', 'OK', 'KO');
+        $this->compareTo($dom->findAll('body')->getHtml(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div></body>', 'OK', 'KO');
         unset($h1);
 
         $this->iteration("Insertion d'un texte après après la balise 'div'");
 
-        $div = $dom->find('div')[0];
+        $div = $dom->findAll('div')[0];
         $div->after('ainsi >');
 
-        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>ainsi &gt;</body>', 'OK', 'KO');
+        $this->compareTo($dom->findAll('body')->getHtml(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>ainsi &gt;</body>', 'OK', 'KO');
 
         $this->iteration('Gestion du "&" lors des manipulations dans le texte');
 
         $div->after("xxx&xxx");
 
-        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
+        $this->compareTo($dom->findAll('body')->getHtml(), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
 
         $this->iteration("Remplacement de la balise 'div' par la balise 'h5'");
 
         $div->replace("<h5>TAC</h5>");
 
-        $this->compareTo($dom->find('body')->html(), '<body><span>test</span><h1>nothing</h1><h5>TAC</h5>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
+        $this->compareTo($dom->findAll('body')->getHtml(), '<body><span>test</span><h1>nothing</h1><h5>TAC</h5>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
 
         $this->iteration("Suppression des balises 'span'");
 
-        $dom->find('span')->remove();
+        $dom->findAll('span')->remove();
 
-        $this->compareTo($dom->find('body')->html(), '<body><h1>nothing</h1><h5>TAC</h5>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
+        $this->compareTo($dom->findAll('body')->getHtml(), '<body><h1>nothing</h1><h5>TAC</h5>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
     }
 
     public function testRetrieving(): void
@@ -69,51 +69,51 @@ class SimpleHtmlTest extends TestCase
         /** @var SimpleHtmlDom $dom */
         $dom = SimpleHtml::str_get_html($html)->getContainer();
         /** @var SimpleHtmlNodeList $nodeList */
-        $nodeList = $dom->find('h1');
+        $nodeList = $dom->findAll('h1');
 
         $this->iteration('Récupération du premier element H1 de <h1><h1>test</h1><h3>ahlalallalalalal</h3></h1>');
 
-        $this->compareTo($nodeList[0]->text(),'testahlalallalalalal','OK','KO');
+        $this->compareTo($nodeList[0]->getText(),'testahlalallalalalal','OK','KO');
 
         $this->iteration('Récupération du second element H1 de <h1><h1>test</h1><h3>ahlalallalalalal</h3></h1>');
 
-        $this->compareTo($nodeList[1]->text(),'test','OK','KO');
+        $this->compareTo($nodeList[1]->getText(),'test','OK','KO');
 
         $this->iteration('Récupération de l\'élément de classe "pong"');
 
-        $nodeList = $dom->find('[@class=pong]');
+        $nodeList = $dom->findAll('[@class=pong]');
 
-        $this->compareTo((count($nodeList) === 1) && ($nodeList[0]->text() ==='testahlalallalalalal'),true,'OK','KO');
+        $this->compareTo((count($nodeList) === 1) && ($nodeList[0]->getText() ==='testahlalallalalalal'),true,'OK','KO');
 
         $this->iteration("Récupération des attributs du noeud d'id 'none'");
 
-        $div = $dom->find('[@id=none]')[0];
+        $div = $dom->findAll('[@id=none]')[0];
 
         $this->compareTo($div->attributes(),['id' => 'none', 'class' => 'article master'],'OK','KO');
 
         $this->iteration("Récupération du contenu de la première balise 'div'");
         /** @var string $firstDiv */
-        $firstDiv = $dom->find('div')->firstchild();
+        $firstDiv = $dom->findAll('div')->getFirstChild();
 
         $this->compareTo($firstDiv,'<h1 id="test">Ceci est un test</h1>','OK','KO');
 
-        $this->iteration("Test de la commande innertext du 'div'");
+        $this->iteration("Test de la commande getInnertext() du 'div'");
 
-        $this->compareTo($dom->find('div')[0]->innertext(),'Ceci est un test','OK','KO');
+        $this->compareTo($dom->findAll('div')->getInnertext(),'Ceci est un test','OK','KO');
 
         /** @var string $html */
         $html = "<ul><li>a</li><li>b</li><li>c</li></ul>";
         /** @var SimpleHtmlDom $dom */
         $dom = SimpleHtml::str_get_html($html)->getContainer();
 
-        $this->iteration("Correspondance entre html() et les méthodes de SimpleHtmlBase");
+        $this->iteration("Correspondance entre getHtml() et les méthodes de SimpleHtmlBase");
 
-        $this->subiteration("Correspondance entre html() et firstchild()");
+        $this->subiteration("Correspondance entre getHtml() et getFirstChild()");
 
-        $this->compareTo($dom->find('li')[0]->html(),$dom->find('ul')->firstchild(),'OK','KO');
+        $this->compareTo($dom->findAll('li')[0]->getHtml(),$dom->findAll('ul')->getFirstChild(),'OK','KO');
 
-        $this->subiteration("Correspondance entre html() et lastchild()");
+        $this->subiteration("Correspondance entre getHtml() et getLastChild()");
 
-        $this->compareTo($dom->find('li')[2]->html(),$dom->find('ul')->lastchild(),'OK','KO');
+        $this->compareTo($dom->findAll('li')[2]->getHtml(),$dom->findAll('ul')->getLastChild(),'OK','KO');
     }
 }
