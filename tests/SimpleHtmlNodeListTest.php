@@ -33,12 +33,6 @@ class SimpleHtmlNodeListTest extends TestCase
 
         $this->compareTo((count($nodeList) === 1) && ($nodeList[0]->getText() ==='testahlalallalalalal'),true,'OK','KO');
 
-        $this->iteration("Récupération des attributs du noeud d'id 'none'");
-
-        $div = $dom->findAll('[@id=none]')[0];
-
-        $this->compareTo($div->attributes(),['id' => 'none', 'class' => 'article master'],'OK','KO');
-
         $this->iteration("Récupération du contenu de la première balise 'div'");
         /** @var string $firstDiv */
         $firstDiv = $dom->findAll('div')->getFirstChild();

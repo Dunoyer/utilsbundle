@@ -68,6 +68,10 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
         return $node;
     }
 
+    /**
+     * @param string $html
+     * @return SimpleHtmlDom
+     */
     public function insertBefore(string $html): self
     {
         $fragment = $this->getFragment($html);
@@ -99,7 +103,41 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
         return preg_replace('/ /', '_', strtolower($str));
     }
 
-    public function attributes(): array
+    public function hasClass(string $classname): bool
+    {
+        return in_array($classname, $this->getClasses());
+    }
+    /**
+     * @return array
+     */
+    public function getClasses(): array
+    {
+        $strClasses   = $this->getAttribute('class') ?? "";
+        $strClasses   = trim(preg_replace("/[ ]+/"," ", $strClasses));
+        $output       = explode(" ", $strClasses);
+        return $output;
+    }
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function hasAttribute(string $key): bool
+    {
+        $data = $this->getAttributes();
+        return (in_array($key, array_keys($data)));
+    }
+
+    /**
+     * @param string $key
+     * @return ?string
+     */
+    public function getAttribute(string $key): ?string
+    {
+      $attrs = $this->getAttributes();
+      return $attrs[$key] ?? null;
+    }
+
+    public function getAttributes(): array
     {
         $ret = [];
         foreach($this->getNode()->attributes as $attr)
