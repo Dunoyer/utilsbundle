@@ -76,6 +76,10 @@ class SimpleHtmlNodeTest extends TestCase
         $this->iteration("Test de la commande getInnerhtml() du 'div'");
 
         $this->compareTo($dom->findOne('div')->getInnerhtml(), '<h1 id="test">Ceci est un test</h1>', 'OK', 'KO');
+
+        $this->iteration("Récupération du nom de tag courant");
+        
+        $this->compareTo($dom->findOne('div')->getTagName(), 'div', 'OK', 'KO');
     }
 
     public function testOnAttributes()

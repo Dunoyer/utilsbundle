@@ -22,6 +22,14 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
     /**
      * @return ?string
      */
+    public function getTagName(): ?string
+    {
+      return $this->getNode()->nodeName;
+    }
+
+    /**
+     * @return ?string
+     */
     public function getPath(): ?string
     {
         return $this->_path;

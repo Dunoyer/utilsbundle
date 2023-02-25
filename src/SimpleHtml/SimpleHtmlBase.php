@@ -247,7 +247,7 @@ class SimpleHtmlBase
     $nxpath = $doc ? $doc->getXpath() : null;
     return $nxpath ? new SimpleHtmlNodeList($nxpath->query($xpath, $this->getNode()), $this->getDoc()) : null;
   }
-  
+
   /**
    * Find nodes with xpath expressions
    *
@@ -275,7 +275,7 @@ class SimpleHtmlBase
    */
   public function getInnertext(): ?string
   {
-    return ($this->getIsText() || !$this->children->length) ? $this->getText() : $this->findAll('./text()|./*')->getText();
+    return ($this->getIsText() || !$this->getChildren()->length) ? $this->getText() : $this->findAll('./text()|./*')->getText();
   }
 
   /**
@@ -298,73 +298,78 @@ class SimpleHtmlBase
     return $this->at('> *:last');
   }
 
+  /**
+   * @param string $id
+   * @param int $index
+   */
+  public function findOneById(string $id, int $index=0): ?SimpleHtmlNode
+  {
+    return $this->findOne("#$id", $index);
+  }
+
+  /**
+   * @param string $tag
+   * @return ?SimpleHtmlNodeList
+   */
+  public function findByTagName(string $tag): ?SimpleHtmlNodeList
+  {
+    return $this->findAll($tag);
+  }
+
+  /**
+   * @param string $tag
+   * @return ?SimpleHtmlNodeList
+   */
+  public function findOneByTagName(string $tag): ?SimpleHtmlNode
+  {
+    return $this->findOne($tag, 0);
+  }
+
+  /**
+   * @param string $id
+   * @return SimpleHtmlNodeList
+   */
+  public function findById(string $id): SimpleHtmlNodeList
+  {
+    return $this->findAll("#$id");
+  }
+
+  /**
+   * @return SimpleHtmlNodeList
+   */
+  public function getChildren(): SimpleHtmlNodeList
+  {
+    return $this->search('./*');
+  }
+
   public function __call($key, $args){
 
     $key = strtolower(str_replace('_', '', $key));
     switch($key){
-      case 'plaintext':
-        return $this->getText();
-      case 'save':
-         return $this->getHtml();
-      case 'tag':
-        return $this->getNode()->nodeName;
+      case 'plaintext': return $this->getText();
+      case 'save': return $this->getHtml();
       case 'next': return $this->at('./following-sibling::*[1]|./following-sibling::text()[1]|./following-sibling::comment()[1]');
-
       case 'index': return $this->search('./preceding-sibling::*')->length + 1;
-
-      /*
-      DOMNode::insertBefore — Adds a new child
-      */
-
-      // simple-html-dom junk methods
-      case 'clear':
-        return;
-
       // search functions
-      case 'at':
-      case 'getelementbytagname':
-        return $this->findOne($args[0], 0);
-
-      case 'search':
-      case 'getelementsbytagname':
-        return isset($args[1]) ? $this->findOne($args[0], $args[1]) : $this->findAll($args[0]);
-
-      case 'getelementbyid': return $this->findOne('#' . $args[0], 0);
-      case 'getelementsbyid': return isset($args[1]) ? $this->findOne('#' . $args[0], $args[1]) : $this->findAll('#' . $args[0]);
-
+      case 'at': return $this->findOne($args[0], 0);
+      case 'search': return isset($args[1]) ? $this->findOne($args[0], $args[1]) : $this->findAll($args[0]);
       // attributes
-      case 'hasattribute': return !$this->getIsText() && $this->getNode()->hasAttribute($args[0]);
-      case 'getattribute': $arg = $args[0]; return $this->$arg;
-      case 'setattribute': $arg0 = $args[0]; $arg1 = $args[1]; return $this->$arg0 = $arg1;
-      case 'removeattribute': $arg = $args[0]; return $this->$arg = null;
-      case 'getattribute': return $this->getNode()->getAttribute($args[0]);
       case 'setattribute': return $this->$args[0] = $args[1];
       case 'removeattribute': return $this->$args[0] = null;
-
-
       // wrap
-      case 'wrap':
-        return $this->replace('<' . $args[0] . '>' . $this . '</' . $args[0] . '>');
-      case 'unwrap':
-        return $this->parent->replace($this);
-
-      case 'str':
-        return new SimpleHtmlString($this->text);
-
+      case 'wrap': return $this->replace('<' . $args[0] . '>' . $this . '</' . $args[0] . '>');
+      case 'unwrap': return $this->parent->replace($this);
+      case 'str': return new SimpleHtmlString($this->text);
       // heirarchy
       case 'nextsibling': return $this->at('+ *');
       case 'prevsibling': return $this->at('./preceding-sibling::*[1]');
       case 'parent': return $this->at('./..');
-      case 'children':
       case 'childnodes':
         $nl = $this->search('./*');
         return isset($args[0]) ? $nl[$args[0]] : $nl;
-
-
       case 'child': // including text/comment nodes
         $nl = $this->search('./*|./text()|./comment()');
         return isset($args[0]) ? $nl[$args[0]] : $nl;
-
     }
 
     if(preg_match(self::TAGS_REGEX, $key, $m)) return $this->findAll($m[1]);
@@ -379,10 +384,6 @@ class SimpleHtmlBase
     if(!preg_match(self::ATTRIBUTE_REGEX, $key, $m)) trigger_error('Unknown method or property: ' . $key, E_USER_WARNING);
     if(!$this->getNode() || $this->getIsText()) return null;
     return $this->getNode()->getAttribute($key);
-  }
-
-  public function __get($key){
-    return $this->$key();
   }
 
   public function destruct()
