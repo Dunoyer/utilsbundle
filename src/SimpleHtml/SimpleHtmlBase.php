@@ -109,7 +109,7 @@ class SimpleHtmlBase
       return $this->getNode()->nodeValue;
   }
 
-  public function html()
+  public function html(): ?string
   {
       return $this->getDoc()->getDom()->saveHTML($this->getNode());
   }
@@ -261,19 +261,27 @@ class SimpleHtmlBase
     }
   }
 
-  public function getFirstChild(): string
+  public function innertext(): ?string
   {
-    return $this->firstchild();
+    return ($this->getIsText() || !$this->children->length) ? $this->text() : $this->find('./text()|./*')->text;
   }
-  
-  // magic methods
+
+  public function firstchild(): ?string
+  {
+    return $this->at('> *');
+  }
+
+  public function lastchild(): ?string
+  {
+    return $this->at('> *:last');
+  }
+
   public function __call($key, $args){
 
     $key = strtolower(str_replace('_', '', $key));
     switch($key){
-      case 'innertext': return ($this->getIsText() || !$this->children->length) ? $this->text() : $this->find('./text()|./*')->outertext ;
-      case 'plaintext': return $this->text();
-      case 'outertext':
+      case 'plaintext':
+        return $this->text();
       case 'html':
       case 'save':
          return $this->html();
@@ -328,8 +336,6 @@ class SimpleHtmlBase
         return new SimpleHtmlString($this->text);
 
       // heirarchy
-      case 'firstchild': return $this->at('> *');
-      case 'lastchild': return $this->at('> *:last');
       case 'nextsibling': return $this->at('+ *');
       case 'prevsibling': return $this->at('./preceding-sibling::*[1]');
       case 'parent': return $this->at('./..');

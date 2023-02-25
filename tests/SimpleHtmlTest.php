@@ -93,8 +93,27 @@ class SimpleHtmlTest extends TestCase
 
         $this->iteration("Récupération du contenu de la première balise 'div'");
         /** @var string $firstDiv */
-        $firstDiv = $dom->find('div')->getFirstChild();
+        $firstDiv = $dom->find('div')->firstchild();
 
         $this->compareTo($firstDiv,'<h1 id="test">Ceci est un test</h1>','OK','KO');
+
+        $this->iteration("Test de la commande innertext du 'div'");
+
+        $this->compareTo($dom->find('div')[0]->innertext(),'Ceci est un test','OK','KO');
+
+        /** @var string $html */
+        $html = "<ul><li>a</li><li>b</li><li>c</li></ul>";
+        /** @var SimpleHtmlDom $dom */
+        $dom = SimpleHtml::str_get_html($html)->getContainer();
+
+        $this->iteration("Correspondance entre html() et les méthodes de SimpleHtmlBase");
+
+        $this->subiteration("Correspondance entre html() et firstchild()");
+
+        $this->compareTo($dom->find('li')[0]->html(),$dom->find('ul')->firstchild(),'OK','KO');
+
+        $this->subiteration("Correspondance entre html() et lastchild()");
+
+        $this->compareTo($dom->find('li')[2]->html(),$dom->find('ul')->lastchild(),'OK','KO');
     }
 }

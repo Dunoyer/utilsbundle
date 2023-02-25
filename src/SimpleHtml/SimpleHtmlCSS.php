@@ -174,7 +174,7 @@ class SimpleHtmlCSS{
     }
   }
 
-  static function translate_part($str, $last_nav = ''){
+  static function translate_part(string $str, $last_nav = ''){
     $str = preg_replace('/:contains\(([^()]*)\)/', '[text*=\\1]', $str); // quick and dirty contains fix
     $retval = array();
     $re = '/(:(?:nth-last-child|nth-of-type|nth-last-of-type|first-child|last-child|first-of-type|last-of-type|only-child|only-of-type|nth-child|first|last|gt|lt|eq|root|nth|empty|not|has|contains|parent|link|visited|hover|active)(?:\((?>[^()]|(?R))*\))?|\[(?>[^\[\]]|(?R))*\]|[#.][\w-]+)/';
@@ -193,7 +193,8 @@ class SimpleHtmlCSS{
     //return $name . implode('', $retval);
   }
 
-  static function translate($str){
+  static function translate(?string $str){
+    $str = (null !== $str) ? $str : "";
     $retval = array();
     $re = '/(\((?>[^()]|(?R))*\)|\[(?>[^\[\]]|(?R))*\]|\s*[+~>]\s*| \s*)/';
     $item = '';
