@@ -174,7 +174,7 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
         return ($this->getCounter() < $this->getNodeList()->length);
     }
 
-    public function last()
+    public function last(): ?SimpleHtmlNode
     {
         return ($this->getNodeList()->length > 0) ? new SimpleHtmlNode($this->getNodeList()->item($this->getNodeList()->length - 1), $this->getDoc()) : null;
     }

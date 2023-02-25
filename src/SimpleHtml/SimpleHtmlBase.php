@@ -109,9 +109,25 @@ class SimpleHtmlBase
       return $this->getNode()->nodeValue;
   }
 
-  public function getHtml(): ?string
+  /**
+   * @param ?string $selector
+   * @return ?string
+   */
+  public function getHtml(?string $selector=null): ?string
   {
-      return $this->getDoc()->getDom()->saveHTML($this->getNode());
+      $html = null;
+      if(null !== $selector) {
+        $current = $this->findOne($selector);
+        if(null !== $current) {
+          $html = $this->getDoc()->getDom()->saveHTML($current->getNode());
+          $current->destruct();
+          unset($current);
+          return $html;
+        }
+      }
+      else
+        $html = $this->getDoc()->getDom()->saveHTML($this->getNode());
+      return $html;
   }
 
   public function __toString()
@@ -238,7 +254,7 @@ class SimpleHtmlBase
    * @param int $index
    * @return ?SimpleHtmlNode
    */
-  public function findOne(string $css, int $index): ?SimpleHtmlNode {
+  public function findOne(string $css, int $index=0): ?SimpleHtmlNode {
     $xpath  =  SimpleHtmlCSS::xpath_for($css);
     $doc    = $this->getDoc() ?? null;
     $nxpath = $doc ? $doc->getXpath() : null;

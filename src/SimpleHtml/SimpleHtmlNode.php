@@ -52,7 +52,7 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
      * @param string $html
      * @return \DOMDocumentFragment
      */
-    private function get_fragment(string $html): \DOMDocumentFragment
+    private function getFragment(string $html): \DOMDocumentFragment
     {
         $dom = $this->getDoc()->getDom();
         $fragment = $dom->createDocumentFragment() or die('nope');
@@ -63,21 +63,25 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
 
     public function replace($html)
     {
-        $node = empty($html) ? null : $this->before($html);
+        $node = empty($html) ? null : $this->insertBefore($html);
         $this->remove();
         return $node;
     }
 
-    public function before(string $html): self
+    public function insertBefore(string $html): self
     {
-        $fragment = $this->get_fragment($html);
+        $fragment = $this->getFragment($html);
         $this->getNode()->parentNode->insertBefore($fragment, $this->getNode());
         return $this;
     }
 
-    public function after(string $html): self
+    /**
+     * @param string $htmlOrText
+     * @return SimpleHtmlNode
+     */
+    public function insertAfter(string $html): self
     {
-        $fragment = $this->get_fragment($html);
+        $fragment = $this->getFragment($html);
         if($ref_node = $this->getNode()->nextSibling)
         {
             $this->getNode()->parentNode->insertBefore($fragment, $ref_node);
