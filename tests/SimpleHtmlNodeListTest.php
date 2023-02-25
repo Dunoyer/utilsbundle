@@ -16,14 +16,20 @@ class SimpleHtmlNodeListTest extends TestCase
         $this->section(self::SECTION_HEADER.self::SUBSECTION_TEST_ON_DEPTH.' Parcours dans l\'arbre du DOM');
 
         /** @var string $html */
-        $html = "<a><b>x</b><c>y</c><b><u>ici</u><v class='der'>la</v></b></a><a>z<c>u</c></a>";
+        $html = "<a><b>x</b><c>y</c><b><u>ici</u><v class='der'>la</v></b></a><a>z<c>u</c><b><v class='der'>tac</v></b></a>";
         /** @var SimpleHtmlDom $dom */
         $dom = SimpleHtml::str_get_html($html)->getContainer();
         /** @var SimpleHtmlNodeList $nodeList */
 
-        $this->iteration('Recherche de la composition de tag "a/b/u"');
-        
+        $this->iteration('Recherche de parcours"');
+
+        $this->subiteration('Recherche de la composition de tag "a/b/u"');
+
         $this->compareTo($dom->findAll('a/b/u')->getText(), "ici", 'OK', 'KO');
+
+        $this->subiteration('Recherche de la composition de tag "a/b/v[class=der]"');
+
+        $this->compareTo(($dom->findAll('a/b/v[class=der]')->getText() === "latac") && ($dom->findOne('a/b/v[class=der]')->getText() === "la"), true, 'OK', 'KO');
     }
 
     public function testRetrieving(): void
