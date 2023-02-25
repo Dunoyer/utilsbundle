@@ -57,6 +57,25 @@ class SimpleHtmlNodeTest extends TestCase
         $dom->findAll('span')->remove();
 
         $this->compareTo($dom->getHtml('body'), '<body><h1>nothing</h1><h5>TAC</h5>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
+
+        /** @var string $html */
+        $html = "<html><body><title class='pong'><h1><h1>test</h1><h3>ahlalallalalalal</h3></h1></title><div id='none' class='article master'><h1 id='test'>Ceci est un test</h1></div></body></html>";
+        /** @var SimpleHtmlDom $dom */
+        $dom = SimpleHtml::str_get_html($html)->getContainer();
+
+        $this->iteration("Récupération du contenu de la première balise 'div'");
+        /** @var string $firstDiv */
+        $firstDiv = $dom->findAll('div')->getFirstChild();
+
+        $this->compareTo($firstDiv,'<h1 id="test">Ceci est un test</h1>','OK','KO');
+
+        $this->iteration("Test de la commande getInnertext() du 'div'");
+
+        $this->compareTo($dom->findOne('div')->getInnertext(),'Ceci est un test','OK','KO');
+
+        $this->iteration("Test de la commande getInnerhtml() du 'div'");
+
+        $this->compareTo($dom->findOne('div')->getInnerhtml(), '<h1 id="test">Ceci est un test</h1>', 'OK', 'KO');
     }
 
     public function testOnAttributes()
@@ -75,11 +94,11 @@ class SimpleHtmlNodeTest extends TestCase
 
       $this->iteration("Détection de la présence de l'attribut 'class' du noeud d'id 'none'");
 
-      $this->compareTo($div->hasAttribute('class'), true, 'OK', 'KO');
+      $this->compareTo(($div->hasAttribute('class') === true) && ($div->hasAttribute('xyz') === false), true, 'OK', 'KO');
 
       $this->iteration("Récupération de l'attribut 'id' du noeud d'id 'none'");
 
-      $this->compareTo($div->getAttribute('id'), 'none', 'OK', 'KO');
+      $this->compareTo(($div->getAttribute('id') === 'none') && ($div->getAttribute('xyz') === null), true, 'OK', 'KO');
 
       $this->iteration('Traitement spécifique sur les classes');
 
@@ -87,7 +106,7 @@ class SimpleHtmlNodeTest extends TestCase
 
       $classes = $div->getClasses();
 
-      $this->compareTo(in_array('article', $classes) && in_array('master', $classes), true, 'OK', 'KO');
+      $this->compareTo(in_array('article', $classes) && !in_array('albert', $classes), true, 'OK', 'KO');
 
       $this->subiteration('Raccourci pour vérifier l\'existence d\'une classe');
 

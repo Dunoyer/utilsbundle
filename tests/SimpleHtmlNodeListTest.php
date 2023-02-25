@@ -33,15 +33,13 @@ class SimpleHtmlNodeListTest extends TestCase
 
         $this->compareTo((count($nodeList) === 1) && ($nodeList[0]->getText() ==='testahlalallalalalal'),true,'OK','KO');
 
-        $this->iteration("Récupération du contenu de la première balise 'div'");
-        /** @var string $firstDiv */
-        $firstDiv = $dom->findAll('div')->getFirstChild();
+        $this->iteration("Test de la commande getInnertext() sur les balises 'h1'");
 
-        $this->compareTo($firstDiv,'<h1 id="test">Ceci est un test</h1>','OK','KO');
+        $this->compareTo($dom->findAll('h1')->getInnertext(),'testahlalallalalalaltestCeci est un test','OK','KO');
 
-        $this->iteration("Test de la commande getInnertext() du 'div'");
+        $this->iteration("Test de la commande getInnerhtml() sur les balises 'h1'");
 
-        $this->compareTo($dom->findAll('div')->getInnertext(),'Ceci est un test','OK','KO');
+        $this->compareTo($dom->findAll('h1')->getInnerhtml(), '<h1>test</h1><h3>ahlalallalalalal</h3>testCeci est un test', 'OK', 'KO');
 
         /** @var string $html */
         $html = "<ul><li>a</li><li>b</li><li>c</li></ul>";

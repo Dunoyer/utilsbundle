@@ -274,6 +274,13 @@ class SimpleHtmlBase
     return ($this->getIsText() || !$this->children->length) ? $this->getText() : $this->findAll('./text()|./*')->getText();
   }
 
+  public function getInnerhtml(): ?string
+  {
+    $ret = '';
+    foreach($this->getNode()->childNodes as $child) $ret .= $this->getDoc()->getDom()->saveHTML($child);
+    return $ret;
+  }
+
   public function getFirstChild(): ?string
   {
     return $this->at('> *');
@@ -292,11 +299,6 @@ class SimpleHtmlBase
         return $this->getText();
       case 'save':
          return $this->getHtml();
-      case 'innerhtml':
-        $ret = '';
-        foreach($this->getNode()->childNodes as $child) $ret .= $this->getDoc()->getDom()->saveHTML($child);
-        return $ret;
-
       case 'tag':
         return $this->getNode()->nodeName;
       case 'next': return $this->at('./following-sibling::*[1]|./following-sibling::text()[1]|./following-sibling::comment()[1]');
