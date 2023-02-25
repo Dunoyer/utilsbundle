@@ -9,6 +9,23 @@ class SimpleHtmlNodeListTest extends TestCase
 {
     const SECTION_HEADER = '[SimpleHtml:SimpleHtmlNodeList]';
 
+    const SUBSECTION_TEST_ON_DEPTH = '[depth]';
+
+    public function testDepth(): void
+    {
+        $this->section(self::SECTION_HEADER.self::SUBSECTION_TEST_ON_DEPTH.' Parcours dans l\'arbre du DOM');
+
+        /** @var string $html */
+        $html = "<a><b>x</b><c>y</c><b><u>ici</u><v class='der'>la</v></b></a><a>z<c>u</c></a>";
+        /** @var SimpleHtmlDom $dom */
+        $dom = SimpleHtml::str_get_html($html)->getContainer();
+        /** @var SimpleHtmlNodeList $nodeList */
+
+        $this->iteration('Recherche de la composition de tag "a/b/u"');
+        
+        $this->compareTo($dom->findAll('a/b/u')->getText(), "ici", 'OK', 'KO');
+    }
+
     public function testRetrieving(): void
     {
         $this->section(self::SECTION_HEADER.' Validation sur la récupération des informations du DOM');

@@ -247,6 +247,7 @@ class SimpleHtmlBase
     $nxpath = $doc ? $doc->getXpath() : null;
     return $nxpath ? new SimpleHtmlNodeList($nxpath->query($xpath, $this->getNode()), $this->getDoc()) : null;
   }
+  
   /**
    * Find nodes with xpath expressions
    *

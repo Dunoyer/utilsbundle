@@ -180,8 +180,6 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
         switch($key)
         {
             case 'text':
-            case 'innertext':
-            case 'innerText':
             case 'plaintext':
                 $this->getNode()->nodeValue = $value;
                 return;
@@ -195,8 +193,6 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
                 }
                 $this->setNode($el->node);
                 return;
-            //default: trigger_error('Unknown property: ' . $key, E_USER_WARNING);
-            //case 'name': return $this->getNode()->nodeName;
         }
 
         if (in_array($key,array('_path','dom','doc','node')))
