@@ -269,11 +269,17 @@ class SimpleHtmlBase
     return $node ? new SimpleHtmlNode($node, $this->getDoc()) : null;
   }
 
+  /**
+   * @return ?string
+   */
   public function getInnertext(): ?string
   {
     return ($this->getIsText() || !$this->children->length) ? $this->getText() : $this->findAll('./text()|./*')->getText();
   }
 
+  /**
+   * @return ?string
+   */
   public function getInnerhtml(): ?string
   {
     $ret = '';
