@@ -187,7 +187,6 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
     {
         switch($key)
         {
-            case 'text':
             case 'plaintext':
                 $this->getNode()->nodeValue = $value;
                 return;

@@ -395,6 +395,5 @@ class SimpleHtmlBase
 	 unset($this->_node);
 	 unset($this->_dom);
 	 unset($this->_doc);
-
   }
 }
