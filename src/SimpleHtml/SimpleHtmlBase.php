@@ -1,4 +1,5 @@
 <?php
+
 namespace FOPG\Component\UtilsBundle\SimpleHtml;
 
 class SimpleHtmlBase
@@ -11,22 +12,22 @@ class SimpleHtmlBase
   /**
    * @var FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase
    */
-  private $_doc;
+  private ?SimpleHtmlBase $_doc = null;
 
   /**
-   * @var FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase
+   * @var FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlDom
    */
-  private $_dom;
+  private $_dom = null;
 
   /**
-   * @var \DOMElement
+   * @var ?\DOMElement
    */
-  private $_node;
+  private ?\DOMElement $_node = null;
 
   /**
    * @var bool
    */
-  protected $is_text = false;
+  protected bool $is_text = false;
 
   /**
    * @param FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase $doc
@@ -42,7 +43,7 @@ class SimpleHtmlBase
   /**
    * @return FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase
    */
-  public function getDoc()
+  public function getDoc(): ?SimpleHtmlDom
   {
       return $this->_doc;
   }
@@ -61,7 +62,7 @@ class SimpleHtmlBase
   /**
    * @return \DOMDocument
    */
-  public function getDom()
+  public function getDom(): ?\DOMDocument
   {
       return $this->_dom;
   }
@@ -102,11 +103,6 @@ class SimpleHtmlBase
   public function getIsText()
   {
       return $this->is_text;
-  }
-
-  public function getText()
-  {
-      return $this->getNode()->nodeValue;
   }
 
   /**
@@ -275,7 +271,7 @@ class SimpleHtmlBase
    */
   public function getInnertext(): ?string
   {
-    return ($this->getIsText() || !$this->getChildren()->length) ? $this->getText() : $this->findAll('./text()|./*')->getText();
+    return ($this->getIsText() || !$this->getChildren()->getLength()) ? $this->getText() : $this->findAll('./text()|./*')->getText();
   }
 
   /**
@@ -288,7 +284,7 @@ class SimpleHtmlBase
     return $ret;
   }
 
-  public function getFirstChild(): ?string
+  public function getFirstChild(): ?SimpleHtmlNode
   {
     return $this->at('> *');
   }
@@ -332,14 +328,6 @@ class SimpleHtmlBase
   public function findById(string $id): SimpleHtmlNodeList
   {
     return $this->findAll("#$id");
-  }
-
-  /**
-   * @return SimpleHtmlNodeList
-   */
-  public function getChildren(): SimpleHtmlNodeList
-  {
-    return $this->search('./*');
   }
 
   public function __call($key, $args){

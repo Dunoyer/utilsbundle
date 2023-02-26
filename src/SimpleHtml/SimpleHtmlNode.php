@@ -1,7 +1,12 @@
 <?php
+
 namespace FOPG\Component\UtilsBundle\SimpleHtml;
 
+use FOPG\Component\UtilsBundle\SimpleHtml\Trait\SimpleHtmlNodeTrait;
+
 class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
+
+    use SimpleHtmlNodeTrait;
 
     /**
      * @var ?string
@@ -17,6 +22,14 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
         $this->_path = $path;
 
         return $this;
+    }
+
+    /**
+     * @return SimpleHtmlNodeList
+     */
+    public function getChildren(): SimpleHtmlNodeList
+    {
+      return $this->search('./*');
     }
 
     /**

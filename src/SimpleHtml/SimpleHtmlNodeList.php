@@ -1,8 +1,12 @@
 <?php
+
 namespace FOPG\Component\UtilsBundle\SimpleHtml;
+
+use FOPG\Component\UtilsBundle\SimpleHtml\Trait\SimpleHtmlNodeTrait;
 
 class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
 {
+    use SimpleHtmlNodeTrait;
 
     /**
      * @var \DOMNodeList
@@ -18,6 +22,16 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
      * @var int
      */
     private int $_counter = 0;
+
+    /**
+     * @var int
+     */
+    private int $length = 0;
+
+    public function getLength(): int
+    {
+        return $this->length;
+    }
 
     /**
      * @param \DOMNodeList $nodeList
@@ -302,19 +316,6 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
             $retval[] = isset($values[0]) ? $node->$key($values[0]) : $node->$key();
         }
         return implode('', $retval);
-    }
-
-    public function __get($key)
-    {
-        return $this->$key();
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->html();
     }
 
     /**
