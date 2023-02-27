@@ -9,24 +9,12 @@ class SimpleHtmlBase
   const ATTRIBUTE_REGEX = "/^(href|src|id|class|name|text|height|width|content|value|title|alt|data-[\w\-]+)$/";
   const ATTRIBUTES_REGEX = "/^(href|src|id|class|name|text|height|width|content|value|title|alt|data-[\w\-]+)e?s$/";
 
-  /**
-   * @var FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlBase
-   */
   private ?SimpleHtmlBase $_doc = null;
 
-  /**
-   * @var FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlDom
-   */
-  private $_dom = null;
+  private ?\DOMDocument $_dom = null;
 
-  /**
-   * @var ?\DOMElement
-   */
   private ?\DOMElement $_node = null;
 
-  /**
-   * @var bool
-   */
   protected bool $is_text = false;
 
   /**
@@ -253,11 +241,15 @@ class SimpleHtmlBase
    */
   public function findOne(string $css, int $index=0): ?SimpleHtmlNode {
     $xpath  =  SimpleHtmlCSS::xpath_for($css);
+    /** @var ?SimpleHtmlDom $doc */
     $doc    = $this->getDoc() ?? null;
+    /** @var ?\DOMXPath $nxpath */
     $nxpath = $doc ? $doc->getXpath() : null;
+    /** @var ?\DOMElement $node */
     $node   = null;
     if(null !== $nxpath)
     {
+      /** @var \DOMNodeList $nl */
       $nl = $nxpath->query($xpath, $this->getNode());
       if($index < 0)
         $index = $nl->length + $index;
