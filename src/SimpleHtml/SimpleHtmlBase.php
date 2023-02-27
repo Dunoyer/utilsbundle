@@ -291,11 +291,7 @@ class SimpleHtmlBase
 
 /**
   public function __call($key, $args){
-    $key = strtolower(str_replace('_', '', $key));
     switch($key){
-      case 'next': return $this->at('./following-sibling::*[1]|./following-sibling::text()[1]|./following-sibling::comment()[1]');
-      case 'index': return $this->search('./preceding-sibling::*')->length + 1;
-      // search functions
       // attributes
       case 'setattribute': return $this->$args[0] = $args[1];
       case 'removeattribute': return $this->$args[0] = null;

@@ -50,12 +50,10 @@ class SimpleHtmlNodeListTest extends TestCase
         $node = $dom->findOne('li');
         $this->iteration('Parcours alternatif à la méthode findAll()');
 
-        $this->subiteration('Parcours par la méthode findNextOne()');
-
+        $this->subiteration('Parcours par la méthode findNextOne() et contrôle du getIndex()');
         $check = true;
         for($i=2;($node = $node->findNextOne());$i++)
-          $check = $check && ((string)$node === "<li>$i</li>");
-
+          $check = $check && ((string)$node === "<li>$i</li>") && ($i === $node->getIndex());
         $this->compareTo($check, true, 'OK', 'KO');
     }
 

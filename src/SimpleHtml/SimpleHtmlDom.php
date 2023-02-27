@@ -49,7 +49,7 @@ class SimpleHtmlDom extends SimpleHtmlBase{
      public function load(string $html,bool $is_xml = false)
      {
          $this->setDom(new \DOMDocument());
-         if($is_xml)
+         if(true === $is_xml)
          {
              @$this->getDom()->loadXML(preg_replace('/xmlns=".*?"/ ', '', $html));
          }
@@ -70,9 +70,13 @@ class SimpleHtmlDom extends SimpleHtmlBase{
          $this->load(file_get_contents($file), $is_xml);
      }
 
-     public function text(){ return $this->_root->text; }
-
-     public function title(){ return $this->at('title')->text(); }
+     public function getTitle(): ?string
+     {
+       $title = $this->findOne('title');
+       $text  = (null !== $title) ? $title->getText() : null;
+       unset($title);
+       return $text;
+     }
 
      public function destruct()
      {

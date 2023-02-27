@@ -9,9 +9,19 @@ class SimpleHtmlNodeTest extends TestCase
 {
     const SECTION_HEADER = '[SimpleHtml:SimpleHtmlNode]';
     const SUBSECTION_TEST_ON_ATTRIBUTES = '[Attributes]';
+    const SUBSECTION_TEST_ON_TAG = '[Tags]';
     public function testBuilding(): void
     {
-        $this->section(self::SECTION_HEADER.' Validation sur la transformation des informations du DOM');
+        $this->section(self::SECTION_HEADER.self::SUBSECTION_TEST_ON_TAG.' Validation sur la transformation des informations du DOM');
+        /** @var string $html */
+        $html = "<html><head><title>Test</title></head><body><h1>nothing</h1><span>full</span></body></html>";
+        /** @var SimpleHtmlDom $dom */
+        $dom = SimpleHtml::str_get_html($html)->getContainer();
+
+        $this->iteration('Recupération du titre');
+
+        $this->compareTo($dom->getTitle(), "Test", "OK", "KO");
+
         /** @var string $html */
         $html = "<html><body><h1>nothing</h1></body></html>";
         /** @var SimpleHtmlDom $dom */

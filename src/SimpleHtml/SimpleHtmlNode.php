@@ -73,6 +73,10 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
       return $this->findOne('./following-sibling::*[1]|./following-sibling::text()[1]|./following-sibling::comment()[1]');
     }
 
+    public function getIndex(): ?int {
+      return $this->findAll('./preceding-sibling::*')->getLength() + 1;
+    }
+
     /**
      * @return ?string
      */
