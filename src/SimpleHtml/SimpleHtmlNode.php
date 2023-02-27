@@ -60,7 +60,7 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
       $length     = $childNodes->length;
       return ($length > 0) ? new SimpleHtmlNode($childNodes[$length-1], $this->getDoc()) : null;
     }
-    
+
     /**
      * @return SimpleHtmlNodeList
      */
@@ -231,41 +231,6 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
             }
         }
         return $ret;
-    }
-
-    public function __set($key, $value)
-    {
-        switch($key)
-        {
-            case 'plaintext':
-                $this->getNode()->nodeValue = $value;
-                return;
-            case 'outertext':
-                $this->replace($value); return;
-            case 'tag':
-                $el = $this->replace('<' . $value . '>' . $this->innerhtml . '</' . $value . '>');
-                foreach($this->getNode()->attributes as $key => $att)
-                {
-                    $el->$key = $att->nodeValue;
-                }
-                $this->setNode($el->node);
-                return;
-        }
-
-        if (in_array($key,array('_path','dom','doc','node')))
-        {
-            return;
-        }
-
-        //trigger_error('Unknown property: ' . $key, E_USER_WARNING);
-        if($value === null)
-        {
-            $this->getNode()->removeAttribute($key);
-        }
-        else
-        {
-            $this->getNode()->setAttribute($key, $value);
-        }
     }
 
     /**

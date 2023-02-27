@@ -299,57 +299,6 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
         return (null !== $lastNode) ? $lastNode->getLastChild() : null;
     }
 
-    // magic methods
-    public function __call($key, $values)
-    {
-        $key = strtolower(str_replace('_', '', $key));
-        switch($key)
-        {
-            case 'to_a':
-                $retval = array();
-                foreach($this as $node)
-                {
-                    $retval[] = new SimpleHtmlNode($this->getNodeList()->item($this->getCounter()), $this->getDoc());
-                }
-                return $retval;
-                break;
-            default:
-        }
-        // otherwise
-
-        $retval = array();
-
-        /*
-        if(preg_match(TAGS_REGEX, $key, $m)) return $this->find($m[1]);
-        if(preg_match(TAG_REGEX, $key, $m)) return $this->find($m[1], 0);
-        */
-
-        if(
-            preg_match(SimpleHtmlBase::ATTRIBUTES_REGEX, $key, $m) ||
-            preg_match('/^((clean|trim|str).*)s$/', $key, $m)
-        )
-        {
-            foreach($this as $node)
-            {
-                $arg = $m[1];
-                $retval[] = $node->$arg;
-            }
-            return $retval;
-        }
-
-        if(preg_match(SimpleHtmlBase::ATTRIBUTE_REGEX, $key, $m))
-        {
-            foreach($this as $node)
-            {
-                $arg = $m[1];
-                $retval[] = $node->$arg;
-            }
-            return implode('', $retval);
-        }
-
-        return null;
-    }
-
     /**
      * @return int
      */
