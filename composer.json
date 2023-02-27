@@ -2,7 +2,7 @@
     "name": "friend-of-pastry-garden/utils-bundle",
     "type": "library",
     "description": "Fourniture d'outils d'aide au développement",
-    "keywords": ["SimpleHtml"],
+    "keywords": ["SimpleHtml", "TestCase"],
     "authors": [
       {
         "name": "Yannick ROUSSEL",
@@ -24,7 +24,7 @@
         "symfony/yaml": "6.2.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^10.0",
         "symfony/browser-kit": "6.2.*",
         "symfony/css-selector": "6.2.*",
         "symfony/maker-bundle": "^1.48",
