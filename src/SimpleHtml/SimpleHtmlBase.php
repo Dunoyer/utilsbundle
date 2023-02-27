@@ -267,39 +267,6 @@ class SimpleHtmlBase
   }
 
   /**
-   * @return ?string
-   */
-  public function getInnertext(): ?string
-  {
-    return ($this->getIsText() || !$this->getChildren()->getLength()) ? $this->getText() : $this->findAll('./text()|./*')->getText();
-  }
-
-  /**
-   * @return ?string
-   */
-  public function getInnerhtml(): ?string
-  {
-    $ret = '';
-    foreach($this->getNode()->childNodes as $child) $ret .= $this->getDoc()->getDom()->saveHTML($child);
-    return $ret;
-  }
-
-  public function getFirstChild(): ?SimpleHtmlNode
-  {
-    /** @var \DOMNodeList *childNodes */
-    $childNodes = $this->getNode()->childNodes;
-    /** @var int $length */
-    $length     = $childNodes->length;
-    return ($length > 0) ? new SimpleHtmlNode($childNodes[0], $this->getDoc()) : null;
-    //return $this->at('> *');
-  }
-
-  public function getLastChild(): ?string
-  {
-    return $this->at('> *:last');
-  }
-
-  /**
    * @param string $id
    * @param int $index
    */

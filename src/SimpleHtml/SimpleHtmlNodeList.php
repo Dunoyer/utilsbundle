@@ -262,6 +262,43 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
         return $this->doMath($nl, 'intersect');
     }
 
+    public function getInnertext(): ?string
+    {
+        /** @var SimpleHtmlNode $node */
+        foreach($this as $node)
+        {
+          $retval[] = $node->getInnertext();
+        }
+        return implode("",$retval);
+    }
+
+    public function getInnerhtml(): ?string
+    {
+        /** @var SimpleHtmlNode $node */
+        foreach($this as $node)
+        {
+          $retval[] = $node->getInnerhtml();
+        }
+        return implode("",$retval);
+    }
+
+    public function getFirstChild(): ?SimpleHtmlNode
+    {
+        /** @var SimpleHtmlNode $node */
+        foreach($this as $node)
+          return $node->getFirstChild();
+        return null;
+    }
+
+    public function getLastChild(): ?SimpleHtmlNode
+    {
+        $lastNode = null;
+        /** @var SimpleHtmlNode $node */
+        foreach($this as $node)
+          $lastNode = $node;
+        return (null !== $lastNode) ? $lastNode->getLastChild() : null;
+    }
+
     // magic methods
     public function __call($key, $values)
     {
@@ -310,17 +347,7 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
             return implode('', $retval);
         }
 
-        // what now?
-        foreach($this as $node)
-        {
-
-            $retval[] = isset($values[0]) ? $node->$key($values[0]) : $node->$key();
-        }
-        if(in_array($key, ['getfirstchild'])) {
-          return $retval[0];
-        }
-
-        return implode('', $retval);
+        return null;
     }
 
     /**

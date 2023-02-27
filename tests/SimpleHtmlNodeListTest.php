@@ -89,6 +89,6 @@ class SimpleHtmlNodeListTest extends TestCase
 
         $this->subiteration("Correspondance entre getHtml() et getLastChild()");
 
-        $this->compareTo($dom->findAll('li')[2]->getHtml(),$dom->findAll('ul')->getLastChild(),'OK','KO');
+        $this->compareTo($dom->findAll('li')[2]->getHtml(),$dom->findAll('ul')->getLastChild()->getHtml(),'OK','KO');
     }
 }

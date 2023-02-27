@@ -25,6 +25,43 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
     }
 
     /**
+     * @return ?string
+     */
+    public function getInnertext(): ?string
+    {
+      $innerText = ($this->getIsText() || !$this->getChildren()->getLength()) ? $this->getText() : $this->findAll('./text()|./*')->getText();
+      return $innerText;
+    }
+
+    /**
+     * @return ?string
+     */
+    public function getInnerhtml(): ?string
+    {
+      $ret = '';
+      foreach($this->getNode()->childNodes as $child) $ret .= $this->getDoc()->getDom()->saveHTML($child);
+      return $ret;
+    }
+
+    public function getFirstChild(): ?SimpleHtmlNode
+    {
+      /** @var \DOMNodeList *childNodes */
+      $childNodes = $this->getNode()->childNodes;
+      /** @var int $length */
+      $length     = $childNodes->length;
+      return ($length > 0) ? new SimpleHtmlNode($childNodes[0], $this->getDoc()) : null;
+    }
+
+    public function getLastChild(): ?SimpleHtmlNode
+    {
+      /** @var \DOMNodeList *childNodes */
+      $childNodes = $this->getNode()->childNodes;
+      /** @var int $length */
+      $length     = $childNodes->length;
+      return ($length > 0) ? new SimpleHtmlNode($childNodes[$length-1], $this->getDoc()) : null;
+    }
+    
+    /**
      * @return SimpleHtmlNodeList
      */
     public function getChildren(): SimpleHtmlNodeList
