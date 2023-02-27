@@ -30,7 +30,7 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
 
     public function getLength(): int
     {
-        return $this->length;
+        return count($this);
     }
 
     /**

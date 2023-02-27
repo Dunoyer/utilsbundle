@@ -114,11 +114,6 @@ class SimpleHtmlBase
       return $html;
   }
 
-  public function __toString()
-  {
-      return $this->getHtml();
-  }
-
   public static function cleanupXpatWithIdAndClass(string $xpath): string
   {
     $tmp = preg_replace("/\[(\d+)\]/","#####$1#####",$xpath);
@@ -294,17 +289,13 @@ class SimpleHtmlBase
     return $this->findAll("#$id");
   }
 
+/**
   public function __call($key, $args){
-
     $key = strtolower(str_replace('_', '', $key));
     switch($key){
-      case 'plaintext': return $this->getText();
-      case 'save': return $this->getHtml();
       case 'next': return $this->at('./following-sibling::*[1]|./following-sibling::text()[1]|./following-sibling::comment()[1]');
       case 'index': return $this->search('./preceding-sibling::*')->length + 1;
       // search functions
-      case 'at': return $this->findOne($args[0], 0);
-      case 'search': return isset($args[1]) ? $this->findOne($args[0], $args[1]) : $this->findAll($args[0]);
       // attributes
       case 'setattribute': return $this->$args[0] = $args[1];
       case 'removeattribute': return $this->$args[0] = null;
@@ -337,7 +328,7 @@ class SimpleHtmlBase
     if(!$this->getNode() || $this->getIsText()) return null;
     return $this->getNode()->getAttribute($key);
   }
-
+*/
   public function destruct()
   {
 	 $this->_doc    = null;

@@ -42,6 +42,21 @@ class SimpleHtmlNodeListTest extends TestCase
         $this->subiteration('Recherche de la composition de tag "c" par les méthodes findByTagName() et findOneByTagName()');
 
         $this->compareTo(($dom->findByTagName('c')->getText() === "yu") && ($dom->findOneByTagName('c')->getText() === "y"), true, 'OK', 'KO');
+
+        $html = "<ul><li>1</li><li>2</li><li>3</li></ul>";
+        /** @var SimpleHtmlDom $dom */
+        $dom = SimpleHtml::str_get_html($html)->getContainer();
+
+        $node = $dom->findOne('li');
+        $this->iteration('Parcours alternatif à la méthode findAll()');
+
+        $this->subiteration('Parcours par la méthode findNextOne()');
+
+        $check = true;
+        for($i=2;($node = $node->findNextOne());$i++)
+          $check = $check && ((string)$node === "<li>$i</li>");
+
+        $this->compareTo($check, true, 'OK', 'KO');
     }
 
     public function testRetrieving(): void

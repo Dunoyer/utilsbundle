@@ -66,7 +66,11 @@ class SimpleHtmlNode extends SimpleHtmlBase implements \ArrayAccess{
      */
     public function getChildren(): SimpleHtmlNodeList
     {
-      return $this->search('./*');
+      return $this->findAll('./*');
+    }
+
+    public function findNextOne(): ?SimpleHtmlNode {
+      return $this->findOne('./following-sibling::*[1]|./following-sibling::text()[1]|./following-sibling::comment()[1]');
     }
 
     /**

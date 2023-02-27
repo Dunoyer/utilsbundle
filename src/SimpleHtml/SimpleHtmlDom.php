@@ -58,8 +58,7 @@ class SimpleHtmlDom extends SimpleHtmlBase{
              @$this->getDom()->loadHTML($html);
          }
          $this->setXpath(new \DOMXPath($this->getDom()));
-
-         $this->_root = $this->at('body');
+         $this->_root = $this->findOne('body');
      }
 
      /**
