@@ -286,7 +286,12 @@ class SimpleHtmlBase
 
   public function getFirstChild(): ?SimpleHtmlNode
   {
-    return $this->at('> *');
+    /** @var \DOMNodeList *childNodes */
+    $childNodes = $this->getNode()->childNodes;
+    /** @var int $length */
+    $length     = $childNodes->length;
+    return ($length > 0) ? new SimpleHtmlNode($childNodes[0], $this->getDoc()) : null;
+    //return $this->at('> *');
   }
 
   public function getLastChild(): ?string

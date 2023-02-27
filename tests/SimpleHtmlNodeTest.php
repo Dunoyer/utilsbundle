@@ -66,8 +66,8 @@ class SimpleHtmlNodeTest extends TestCase
         $this->iteration("Récupération du contenu de la première balise 'div'");
         /** @var string $firstDiv */
         $firstDiv = $dom->findAll('div')->getFirstChild();
-
-        $this->compareTo($firstDiv,'<h1 id="test">Ceci est un test</h1>','OK','KO');
+        
+        $this->compareTo($firstDiv->getHtml(),'<h1 id="test">Ceci est un test</h1>','OK','KO');
 
         $this->iteration("Test de la commande getInnertext() du 'div'");
 

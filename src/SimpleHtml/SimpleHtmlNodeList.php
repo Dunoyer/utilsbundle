@@ -313,8 +313,13 @@ class SimpleHtmlNodeList implements \Iterator, \Countable, \ArrayAccess
         // what now?
         foreach($this as $node)
         {
+
             $retval[] = isset($values[0]) ? $node->$key($values[0]) : $node->$key();
         }
+        if(in_array($key, ['getfirstchild'])) {
+          return $retval[0];
+        }
+
         return implode('', $retval);
     }
 
