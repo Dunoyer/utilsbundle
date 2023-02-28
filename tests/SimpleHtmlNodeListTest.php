@@ -4,6 +4,8 @@ namespace FOPG\Component\UtilsBundle\Tests;
 
 use FOPG\Component\UtilsBundle\Test\TestCase;
 use FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtml;
+use FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlDom;
+use FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlNodeList;
 
 class SimpleHtmlNodeListTest extends TestCase
 {
@@ -26,6 +28,17 @@ class SimpleHtmlNodeListTest extends TestCase
         $this->subiteration('Recherche de la composition de tag "a/b/u"');
 
         $this->compareTo($dom->findAll('a/b/u')->getText(), "ici", 'OK', 'KO');
+
+        $this
+          ->given(description: 'Soit un HTML chargé via SimpleHtml',dom: $dom,html: $html)
+          ->when(description: 'Je veux récupérer les éléments répondant au tag "a/b/u"', callback: function(SimpleHtmlDom $dom, ?SimpleHtmlNodeList &$result=null) {
+            $result = $dom->findAll('a/b/u');
+          })
+          ->when(description: 'Je veux que le résultat soit "ici"', callback: function(?string &$myVal=null) { $myVal = "ici"; })
+          ->then(description: 'Le texte de $result doit être égal à "ici"', callback: function(?SimpleHtmlNodeList $result, string $myVal){
+            return ($result->getText() === $myVal);
+          }, result: true)
+        ;
 
         $this->subiteration('Recherche de la composition de tag "a/b/v[class=der]"');
 

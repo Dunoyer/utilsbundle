@@ -1,4 +1,5 @@
 <?php
+
 namespace FOPG\Component\UtilsBundle\Test;
 
 use Psr\Log\LoggerInterface;
@@ -6,6 +7,7 @@ use PHPUnit\Framework\TestCase as SfTestCase;
 
 class TestCase extends SfTestCase {
 
+  const PREFIX_GIVEN = "[ETANT DONNE]";
   private $_iteration_number=0;
   private $_sub_iteration_number=0;
 
@@ -52,6 +54,12 @@ class TestCase extends SfTestCase {
     fwrite(STDERR, str_repeat("-",$len)."\r\n");
     $this->_iteration_number=0;
     $this->_sub_iteration_number=0;
+  }
+
+  public function given(string $description, ...$args): TestGiven
+  {
+    $this->iteration(self::PREFIX_GIVEN.' '.$description);
+    return new TestGiven($this,$args);
   }
 
   public function subiteration(string $text)
