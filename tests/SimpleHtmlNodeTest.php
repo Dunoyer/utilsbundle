@@ -4,6 +4,7 @@ namespace FOPG\Component\UtilsBundle\Tests;
 
 use FOPG\Component\UtilsBundle\Test\TestCase;
 use FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtml;
+use FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtmlDom;
 
 class SimpleHtmlNodeTest extends TestCase
 {
@@ -12,49 +13,137 @@ class SimpleHtmlNodeTest extends TestCase
     const SUBSECTION_TEST_ON_TAG = '[Tags]';
     public function testBuilding(): void
     {
+
         $this->section(self::SECTION_HEADER.self::SUBSECTION_TEST_ON_TAG.' Validation sur la transformation des informations du DOM');
+
         /** @var string $html */
-        $html = "<html><head><title>Test</title></head><body><h1>nothing</h1><span>full</span></body></html>";
+        $html = <<<EOF
+<html>
+  <head>
+    <title>Test</title>
+  </head>
+  <body>
+    <insert_amp>
+      <mam>ping</mam>
+    </insert_amp>
+    <insert_text>
+      <my>tac</my>
+    </insert_text>
+    <insert_here>
+      <h1>nothing</h1>
+    </insert_here>
+    <insert_after>
+      <h5>all</h5>
+    </insert_after>
+  </body>
+</html>
+EOF;
         /** @var SimpleHtmlDom $dom */
         $dom = SimpleHtml::str_get_html($html)->getContainer();
 
-        $this->iteration('Recupération du titre');
+        $this
+          ->given(
+            description: 'On souhaite étudier la récupération d\'informations pour un noeud donné',
+            dom: $dom
+          )
+          ->when(
+            description: 'On isole le titre du document',
+            callback: function(SimpleHtmlDom $dom, ?string &$title=null) {
+              $title = $dom->getTitle();
+            }
+          )
+          ->andWhen(
+            description: 'On insère un SPAN devant le H1 par la méthode insertBefore()',
+            callback: function(SimpleHtmlDom $dom) {
+              $dom
+                ->findOne('h1')
+                ->insertBefore('<span>test</span>')
+              ;
+            }
+          )
+          ->andWhen(
+            description: 'On insère un SPAN après le H5 par la méthode insertAfter()',
+            callback: function(SimpleHtmlDom $dom) {
+              $dom
+                ->findOne('h5')
+                ->insertAfter('<span>test</span>')
+              ;
+            }
+          )
+          ->andWhen(
+            description: 'On insère du texte contenant le caractère spécial ">" après la balise MY par la méthode insertAfter()',
+            callback: function(SimpleHtmlDom $dom) {
+              $dom
+                ->findOne('my')
+                ->insertAfter('>ici')
+              ;
+            }
+          )
+          ->andWhen(
+            description: 'On insère du texte contenant le caractère spécial "&" après la balise MAM par la méthode insertAfter()',
+            callback: function(SimpleHtmlDom $dom) {
+              $dom
+                ->findOne('mam')
+                ->insertAfter('&ici')
+              ;
+            }
+          )
+          ->then(
+            description: "Le contenu de H1 est 'Test'",
+            callback: function(?string $title) {
+              return $title;
+            },
+            result: 'Test'
+          )
+          ->andThen(
+            description: 'Le contenu du BODY prend en compte l\'insertion du SPAN via insertBefore()',
+            callback: function(SimpleHtmlDom $dom) {
+              return str_replace(
+                ["\r","\n","\t"," "],
+                "",
+                $dom->findOne('insert_here')->getHtml()
+              );
 
-        $this->compareTo($dom->getTitle(), "Test", "OK", "KO");
-
-        /** @var string $html */
-        $html = "<html><body><h1>nothing</h1></body></html>";
-        /** @var SimpleHtmlDom $dom */
-        $dom = SimpleHtml::str_get_html($html)->getContainer();
-        /** @var SimpleHtmlNode $h1 */
-        $h1 = $dom->findOne('h1');
-
-        $this->iteration("Insertion d'une balise 'span' devant la balise 'h1'");
-
-        $h1->insertBefore('<span>test</span>');
-
-
-        $this->compareTo($dom->getHtml('body'), "<body><span>test</span><h1>nothing</h1></body>", 'OK', 'KO');
-
-        $this->iteration("Insertion d'une balise 'div' après la balise 'h1'");
-
-        $h1->insertAfter('<div id="ab">test</div>');
-
-        $this->compareTo($dom->getHtml('body'), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div></body>', 'OK', 'KO');
-        unset($h1);
-
-        $this->iteration("Insertion d'un texte après après la balise 'div'");
-
-        $div = $dom->findOne('div');
-        $div->insertAfter('ainsi >');
-
-        $this->compareTo($dom->getHtml('body'), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>ainsi &gt;</body>', 'OK', 'KO');
-
-        $this->iteration('Gestion du "&" lors des manipulations dans le texte');
-
-        $div->insertAfter("xxx&xxx");
-
-        $this->compareTo($dom->getHtml('body'), '<body><span>test</span><h1>nothing</h1><div id="ab">test</div>xxx&amp;xxxainsi &gt;</body>', 'OK', 'KO');
+            },
+            result: "<insert_here><span>test</span><h1>nothing</h1></insert_here>"
+          )
+          ->andThen(
+              description: 'Le contenu du BODY prend en compte l\'insertion du SPAN via insertAfter()',
+              callback: function(SimpleHtmlDom $dom) {
+                return str_replace(
+                  ["\r","\n","\t"," "],
+                  "",
+                  $dom->findOne('insert_after')->getHtml()
+                );
+              },
+              result: "<insert_after><h5>all</h5><span>test</span></insert_after>"
+          )
+          ->andThen(
+              description: 'Le contenu du BODY gère le caractère ">" en tant que texte quand il est isolé via insertAfter()',
+              callback: function(SimpleHtmlDom $dom) {
+                return str_replace(
+                  ["\r","\n","\t"," "],
+                  "",
+                  $dom->findOne('insert_text')->getHtml()
+                );
+              },
+              result: "<insert_text><my>tac</my>&gt;ici</insert_text>"
+          )
+          ->andThen(
+              description: 'Le contenu du BODY gère le caractère "&" en tant que texte quand il est isolé via insertAfter()',
+              callback: function(SimpleHtmlDom $dom) {
+                return str_replace(
+                  ["\r","\n","\t"," "],
+                  "",
+                  $dom->findOne('insert_amp')->getHtml()
+                );
+              },
+              result: "<insert_amp><mam>ping</mam>&amp;ici</insert_amp>"
+          )
+        ;
+        dump('@todo arrêt ici');
+        die;
+        return;
 
         $this->iteration("Remplacement de la balise 'div' par la balise 'h5'");
 
