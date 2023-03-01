@@ -15,16 +15,19 @@ class TestCase extends SfTestCase {
   {
   }
 
-  public function compareTo($value, $valueReferred, $msgOnSuccess, $msgOnFailed): bool {
+  public function compareTo(mixed $value,mixed $valueReferred,string $msgOnSuccess,string $msgOnFailed): bool {
     if(is_array($value))
       $value = serialize($value);
     if(is_array($valueReferred))
       $valueReferred = serialize($valueReferred);
-
-    $msgOnSuccess = str_replace("{value}",$value,$msgOnSuccess);
-    $msgOnSuccess = str_replace("{valueReferred}",$valueReferred,$msgOnSuccess);
-    $msgOnFailed = str_replace("{value}",$value,$msgOnFailed);
-    $msgOnFailed = str_replace("{valueReferred}",$valueReferred,$msgOnFailed);
+    if(null !== $value) {
+      $msgOnSuccess = str_replace("{value}",$value,$msgOnSuccess);
+      $msgOnFailed = str_replace("{value}",$value,$msgOnFailed);
+    }
+    if(null !== $valueReferred) {
+      $msgOnSuccess = str_replace("{valueReferred}",$valueReferred,$msgOnSuccess);
+      $msgOnFailed = str_replace("{valueReferred}",$valueReferred,$msgOnFailed);
+    }
     if($value === $valueReferred) {
       $this->success($msgOnSuccess);
       $this->assertTrue(true);
