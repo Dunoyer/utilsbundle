@@ -3,7 +3,7 @@ Description du sous-composant TestCase
 
 Introduction
 --
-Dans le cadre de la mise à l'échelle applicative, une surcharge du composant natinf TestCase du framework Symfony a été créé. L'objectif est double :
+Afin d'assurer des mises à l'échelle applicative robuste, une surcharge du composant natif TestCase du framework Symfony a été créé. L'objectif est double :
 * rendre humainement compréhensible les réalisations des tests
 * fournir une documentation de premier niveau des composants mis en oeuvre.
 

@@ -7,7 +7,7 @@ L'objectif du composant est de fournir un ensemble d'outils trop limité pour di
 
 Les outils compris dans le module sont :
 * [TestCase](/docs/testCase.md) - surcharge du composant natif Symfony TestCase pour un pilotage des tests unitaire dans le respect du Domain Driven Design
-* SimpleHtml - librairie permettant l'exploration simplifiée d'un document HTML
+* [SimpleHtml](/docs/simpleHtml.md) - librairie permettant l'exploration simplifiée d'un document HTML
 
 Installation
 --
