@@ -26,14 +26,14 @@ class TestCaseTest extends TestCase
           description: "J'applique l'opérateur > entre a et b",
           callback: function(int $a, int $b, &$opSup) { $opSup = ($a>$b); }
         )
-        ->andWhen(
-          description: "J'applique l'opérateur < entre a et c",
-          callback: function(int $a, int $c, &$opInf) { $opInf = ($a<$c); }
-        )
         ->then(
           description: "L'opérateur > doit être booléen et égal à true",
           callback: function($opSup){ return $opSup; },
           result: true
+        )
+        ->andWhen(
+          description: "J'applique l'opérateur < entre a et c",
+          callback: function(int $a, int $c, &$opInf) { $opInf = ($a<$c); }
         )
         ->andThen(
           description: "L'opérateur < doit être booléen et égal à true",
