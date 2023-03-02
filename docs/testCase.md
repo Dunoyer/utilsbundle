@@ -38,13 +38,13 @@ $this
   ->when(description: "J'applique l'opérateur > entre a et b", callback: function(int $a, int $b, &$opSup) {
     $opSup = ($a>$b);
   })
-  ->when(description: "J'applique l'opérateur < entre a et c", callback: function(int $a, int $c, &$opInf) {
+  ->andWhen(description: "J'applique l'opérateur < entre a et c", callback: function(int $a, int $c, &$opInf) {
     $opInf = ($a<$c);
   })
   ->then(description: "L'opérateur > doit être booléen et égal à true", callback: function($opSup){
     return $opSup;
   }, result: true)
-  ->then(description: "L'opérateur < doit être booléen et égal à true", callback: function($opInf){
+  ->andThen(description: "L'opérateur < doit être booléen et égal à true", callback: function($opInf){
     return $opInf;
   }, result: true)
 ;
@@ -59,13 +59,13 @@ Le rendu doit être celui-ci :
 
 1.1. [SI] J'applique l'opérateur > entre a et b
 
-1.2. [SI] J'applique l'opérateur < entre a et c
+1.2. [ET SI] J'applique l'opérateur < entre a et c
 
 1.3. [ALORS] L'opérateur > doit être booléen et égal à true
 
  ✔ OK
 
-1.4. [ALORS] L'opérateur < doit être booléen et égal à true
+1.4. [ET ALORS] L'opérateur < doit être booléen et égal à true
 
  ✔ OK
 ```
