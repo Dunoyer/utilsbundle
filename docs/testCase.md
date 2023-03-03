@@ -15,12 +15,12 @@ Utilisation
 
 Remplacer
 
-```
+```php
 use PHPUnit\Framework\TestCase;
 ```
 par
 
-```
+```php
 use FOPG\Component\UtilsBundle\Test\TestCase;
 ```
 
@@ -28,7 +28,7 @@ use FOPG\Component\UtilsBundle\Test\TestCase;
 
 A l'intérieur d'une méthode test...(), déclarer votre test selon la syntaxe suivante :
 
-```
+```php
 // démontrons que l'opérateur > indique que $a est supérieur à $b et que l'opérateur < indique que $a est inférieur à $c
 $a = 5;
 $b = 3;

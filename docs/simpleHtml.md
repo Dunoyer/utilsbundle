@@ -12,23 +12,27 @@ Démarrage rapide
 
 Soit une variable *$html* contenant le texte d'un élément HTML. Nous allons déclarer l'instance *$dom* qui va nous permettre de manipuler le contenu de cette variable.
 
-```
+```php
 use FOPG\Component\UtilsBundle\SimpleHtml\SimpleHtml;
 ...
 /** @var string $html */
 $html = <<<EOF
 <html>
-<body>
-<title class='pong'>
-<h1>
-  <h1>test</h1>
-  <h3>ahlalallalalalal</h3>
-</h1>
-</title>
-<div id='none' class='article master'>
-  <h1 id='test'>Ceci est un test</h1>
-</div>
-</body>
+  <body>
+    <title class='pong'>
+      <h1>
+        <h1>test</h1>
+        <h3>ahlalallalalalal</h3>
+      </h1>
+    </title>
+    <div id='none' class='article master'>
+      <h1 id='test'>Ceci est un test</h1>
+    </div>
+    <h5>
+      ici
+      <span>texte</span>
+    </h5>
+  </body>
 </html>
 
 /** @var SimpleHtmlDom $dom */
@@ -134,4 +138,23 @@ while($node = $node->findNextOne()) {
 
 ###### 5. Méthode d'extraction de la donnée
 
-@todo
+L'extraction se fait soit en texte, soit en HTML.
+
+```php
+/**
+ * Extraction texte - corps du noeud courant inclus
+ * @var string $text
+ * @var string $outerText
+ */
+$text = $dom->findOne('h3')->getText();
+
+dump($text);      # renvoit 'ahlalallalalalal'
+
+/**
+ * Extraction HTML - corps du noeud courant inclus
+ * @var string $html
+ */
+$html = $dom->findOne('h3')->getHtml();
+
+dump($html);      # renvoit '<h3>ahlalallalalalal</h3>'
+```
