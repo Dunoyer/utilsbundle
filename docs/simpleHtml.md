@@ -26,7 +26,7 @@ $html = <<<EOF
 </h1>
 </title>
 <div id='none' class='article master'>
-<h1 id='test'>Ceci est un test</h1>
+  <h1 id='test'>Ceci est un test</h1>
 </div>
 </body>
 </html>
@@ -37,4 +37,48 @@ $dom = SimpleHtml::str_get_html($html)->getContainer();
 
 #### Cas d'usage de SimpleHtml
 
+##### Recherche de noeuds
+###### 1. Recherche par nom de balises
+```
+/**
+ * Récupération des noeuds de balise H3 contenu par une balise H1
+ * @var SimpleHtmlNodeList $nodes
+ */
+$nodes = $dom->findAll('h1/h3');
+$tab   = [];
+/**
+ * Parcours itératif
+ * @var SimpleHtmlNode $node
+ */
+foreach($nodes as $node) {
+  /** @var string $tmp */
+  $tmp=$node->getText();
+  $tab[]=$tmp;
+}
+/**
+ * Extraction par concaténation des contenus
+ * @var string $full
+ */
+$full = $nodes->getText();
+
+dump(implode(',', $tab)); # renvoit 'ahlalallalalalal'
+dump($full);              # renvoit 'ahlalallalalalal'
+```
+###### 2. Recherche par nom de identifiant
+```
+/**
+ * Récupération des noeuds d'id "test"
+ * @var SimpleHtmlNodeList $nodes
+ */
+$nodes = $dom->findById('test');
+/**
+ * Récupération du premier noeud d'id "test"
+ * @var ?SimpleHtmlNode $node
+ */
+$node = $dom->findOneById('test');
+
+dump($nodes->getText());                # renvoit 'Ceci est un test'
+dump($node ? $node->getText() : null);  # renvoit 'Ceci est un test'
+```
+###### 3. Recherche par nom de classe
 @todo
