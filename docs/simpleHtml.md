@@ -63,6 +63,14 @@ $full = $nodes->getText();
 
 dump(implode(',', $tab)); # renvoit 'ahlalallalalalal'
 dump($full);              # renvoit 'ahlalallalalalal'
+
+/**
+ * Récupération du premier H1
+ * @var ?SimpleHtmlNode $node
+ */
+$node = $dom->findOneByTagName('h1');
+
+dump($node->getText());   # renvoit 'testahlalallalalalal'
 ```
 ###### 2. Recherche par nom de identifiant
 ```
@@ -72,13 +80,36 @@ dump($full);              # renvoit 'ahlalallalalalal'
  */
 $nodes = $dom->findById('test');
 /**
+ * Alternative à la méthode findById()
+ * @var SimpleHtmlNodeList $altNodes
+ */
+$altNodes = $dom->findAll('[id=test]');
+/**
  * Récupération du premier noeud d'id "test"
  * @var ?SimpleHtmlNode $node
  */
 $node = $dom->findOneById('test');
 
 dump($nodes->getText());                # renvoit 'Ceci est un test'
+dump($altNodes->getText());             # renvoit 'Ceci est un test'
 dump($node ? $node->getText() : null);  # renvoit 'Ceci est un test'
 ```
 ###### 3. Recherche par nom de classe
-@todo
+
+```
+/**
+ * Récupération des noeuds de classe 'article'
+ * @var SimpleHtmlNodeList $nodes
+ */
+$nodes = $dom->findAll('[class=article]');
+
+dump($nodes->getText());    # renvoit 'Ceci est un test'
+
+/**
+ * Récupération du premier noeud de classe 'article'
+ * @var ?SimpleHtmlNode $node
+ */
+$node = $dom->findOne('[class=article]');
+
+dump($node->getText());     # renvoit 'Ceci est un test'
+```
