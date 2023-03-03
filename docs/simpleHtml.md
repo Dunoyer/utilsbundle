@@ -39,7 +39,7 @@ $dom = SimpleHtml::str_get_html($html)->getContainer();
 
 ##### Recherche de noeuds
 ###### 1. Recherche par nom de balises
-```
+```php
 /**
  * Récupération des noeuds de balise H3 contenu par une balise H1
  * @var SimpleHtmlNodeList $nodes
@@ -72,8 +72,8 @@ $node = $dom->findOneByTagName('h1');
 
 dump($node->getText());   # renvoit 'testahlalallalalalal'
 ```
-###### 2. Recherche par nom de identifiant
-```
+###### 2. Recherche par identifiant
+```php
 /**
  * Récupération des noeuds d'id "test"
  * @var SimpleHtmlNodeList $nodes
@@ -96,7 +96,7 @@ dump($node ? $node->getText() : null);  # renvoit 'Ceci est un test'
 ```
 ###### 3. Recherche par nom de classe
 
-```
+```php
 /**
  * Récupération des noeuds de classe 'article'
  * @var SimpleHtmlNodeList $nodes
@@ -113,3 +113,25 @@ $node = $dom->findOne('[class=article]');
 
 dump($node->getText());     # renvoit 'Ceci est un test'
 ```
+
+###### 4. Parcours des résultats via pointeur
+
+Une alternative a été développé au parcours par index classique de l'objet SimpleHtmlNodeList, l'approche par pointeur à l'intérieur de l'objet SimpleHtmlNode. Deux méthodes ont été développée pour ce parcours :
+* findNextOne(): ?SimpleHtmlNode - retrouve le successeur ou null si inexistant
+* getIndex() : int - retrouve la position courante dans le parcours
+
+```php
+/**
+ * Récupération du premier H1
+ * @var ?SimpleHtmlNode $node
+ */
+$node = $dom->findOne('h1');
+dump($node->getIndex().' : '.$node->getText());
+while($node = $node->findNextOne()) {
+  dump($node->getIndex().' : '.$node->getText());
+}
+```
+
+###### 5. Méthode d'extraction de la donnée
+
+@todo

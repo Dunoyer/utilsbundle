@@ -181,6 +181,22 @@ class SimpleHtmlNodeListTest extends TestCase
             callback: function(?SimpleHtmlNode $thirdLi) { return $thirdLi->getIndex(); },
             result: 3
           )
+          ->when(
+            description: 'Je tente de récupérer le quatrième élément "li" qui n\'existe pas',
+            callback: function(SimpleHtmlDom $dom, ?SimpleHtmlNode &$qLi=null) {
+                $qLi = $dom
+                  ->findOne('li')
+                  ->findNextOne()
+                  ->findNextOne()
+                  ->findNextOne()
+                ;
+            }
+          )
+          ->then(
+            description: 'La valeur du quatrième LI doit être null',
+            callback: function(?SimpleHtmlNode $qLi) { return $qLi ? $qLi->getText() : $qLi; },
+            result: null
+          )
           ;
     }
 
