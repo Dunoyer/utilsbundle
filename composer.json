@@ -2,15 +2,20 @@
     "name": "friend-of-pastry-garden/utils-bundle",
     "type": "library",
     "description": "Fourniture d'outils d'aide au développement",
-    "keywords": ["SimpleHtml", "TestCase"],
+    "keywords": ["SimpleHtml", "TestCase", "URL", "URI"],
+    "homepage": "https://friend-of-pastry-garden.fr",
     "authors": [
       {
         "name": "Yannick ROUSSEL",
-        "email": "yanroussel@gmail.com"
+        "email": "yannick.roussel@friend-of-pastry-garden.fr"
+      },
+      {
+        "name": "FOPG Community",
+        "homepage": "https://friend-of-pastry-garden.fr/contributors"
       }
     ],
-    "license": "proprietary",
-    "minimum-stability": "stable",
+    "license": "MIT",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
         "php": ">=8.1"
