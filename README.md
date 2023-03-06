@@ -13,6 +13,23 @@ Les outils compris dans le module sont :
 Installation
 --
 
+1. Déclaration du package au sein du composer.json
+
+Rajouter le repository externe pour le bundle utils de la manière suivante :
+
+```yaml
+"repositories": [
+  ...
+  {
+    "type": "vcs",
+    "url": "https://gitlab.adullact.net/friend-of-pastry-garden/component/utilsbundle.git"
+  }
+  ...
+]
+```
+
+2. Appel du bundle pour votre application
+
 ``
 composer require friend-of-pastry-garden/utils-bundle
 ``

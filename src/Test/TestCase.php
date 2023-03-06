@@ -15,6 +15,17 @@ class TestCase extends SfTestCase {
   {
   }
 
+  /**
+   * Récupération de la variable d'environnement courante
+   *
+   * @param string $param
+   * @return ?string
+   */
+  public function getEnv(string $param): ?string
+  {
+    return $_ENV[$param] ?? null;
+  }
+
   public function compareTo(mixed $value,mixed $valueReferred,string $msgOnSuccess,string $msgOnFailed): bool {
     if(is_array($value))
       $value = serialize($value);
