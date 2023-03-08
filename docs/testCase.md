@@ -22,6 +22,7 @@ par
 
 ```php
 use FOPG\Component\UtilsBundle\Test\TestCase;
+use FOPG\Component\UtilsBundle\Test\TestGiven;
 ```
 
 3. Déclarer un nouveau test suivant la DDD
@@ -34,19 +35,32 @@ $a = 5;
 $b = 3;
 $c = 7;
 $this
-  ->given(description: 'Soit trois nombres a,b et c',a: $a,b: $b, c: $c)
-  ->when(description: "J'applique l'opérateur > entre a et b", callback: function(int $a, int $b, &$opSup) {
-    $opSup = ($a>$b);
-  })
-  ->andWhen(description: "J'applique l'opérateur < entre a et c", callback: function(int $a, int $c, &$opInf) {
-    $opInf = ($a<$c);
-  })
-  ->then(description: "L'opérateur > doit être booléen et égal à true", callback: function($opSup){
-    return $opSup;
-  }, result: true)
-  ->andThen(description: "L'opérateur < doit être booléen et égal à true", callback: function($opInf){
-    return $opInf;
-  }, result: true)
+  ->given(
+    description: 'Soit trois nombres a,b et c',
+    a: $a,
+    b: $b,
+    c: $c
+  )
+  ->when(
+    description: "J'applique l'opérateur > entre a et b",
+    callback: function(int $a, int $b, &$opSup) { $opSup = ($a>$b); }
+  )
+  ->andWhen(
+    description: "J'applique l'opérateur < entre a et c",
+    callback: function(int $a, int $c, &$opInf) { $opInf = ($a<$c); }
+  )
+  ->then(
+    description: "L'opérateur > doit être booléen et égal à true",
+    callback: function($opSup){ return $opSup; },
+    result: true,
+    onFail: function(TestGiven $whoami) { $whoami->addError("le > n'est pas bon!", 101) }
+  )
+  ->andThen(
+    description: "L'opérateur < doit être booléen et égal à true",
+    callback: function($opInf){ return $opInf; },
+    result: true,
+    onFail: function(TestGiven $whoami) { $whoami->addError("le < n'est pas bon!", 101) }
+  )
 ;
 ```
 
@@ -69,3 +83,5 @@ Le rendu doit être celui-ci :
 
  ✔ OK
 ```
+
+A noter qu'en cas d'échec, le message d'erreur est piloté par la propriété onFail dans le then(). Si cette propriété n'est pas renseigné, alors la sortie sera un simple message "KO" sans description du problème.
