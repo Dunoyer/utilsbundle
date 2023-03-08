@@ -47,7 +47,7 @@ class TestCaseTest extends TestCase
         )
         ->when(
           description: "J'appelle un paramètre non déclaré",
-        callback: function($param) { }
+        callback: function($param) {  }
         )
 
         ->then(
