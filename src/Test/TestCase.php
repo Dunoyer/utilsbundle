@@ -19,11 +19,28 @@ class TestCase extends SfTestCase {
    * Récupération de la variable d'environnement courante
    *
    * @param string $param
-   * @return ?string
+   * @return mixed
    */
-  public function getEnv(string $param): ?string
+  public function getEnv(string $param): mixed
   {
-    return $_ENV[$param] ?? null;
+    $block = $_ENV[$param] ?? null;
+    if(preg_match("/^[ ]*[{](.*)[}][ ]*$/", $block) && preg_match_all("/[ ]*[']?(?<key>[^'{,]+)[']?[ ]*[:][ ]*(?<value>[']?[^},]+[']?)[ ]*/i", $block, $matches)) {
+      $output = [];
+      $count = count($matches['key']);
+      for($i=0;$i<$count;$i++) {
+        $val = trim($matches['value'][$i]);
+        if(in_array($val,['true','false']))
+          $val = ($val === 'true');
+        elseif(preg_match("/^\d$/",$val))
+          $val = (int)$val;
+        else
+          $val = preg_replace("/(^'|'$)/","", $val);
+        $output[$matches['key'][$i]]=$val;
+      }
+      return $output;
+    }
+    else
+      return $block;
   }
 
   public function compareTo(mixed $value,mixed $valueReferred,string $msgOnSuccess,string $msgOnFailed): bool {
