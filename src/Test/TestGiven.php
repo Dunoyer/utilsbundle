@@ -23,6 +23,10 @@ class TestGiven {
     return $this;
   }
 
+  public function getLastError(): ?string {
+    return $this->_err ?? null;
+  }
+  
   public function andWhen(string $description, Callable $callback): self
   {
     return $this->when($description, $callback, self::PREFIX_AND_WHEN);

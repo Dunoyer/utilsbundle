@@ -3,6 +3,8 @@
 namespace FOPG\Component\UtilsBundle\Tests;
 
 use FOPG\Component\UtilsBundle\Test\TestCase;
+use FOPG\Component\UtilsBundle\Test\TestGiven;
+use FOPG\Component\UtilsBundle\Test\TestMessageError;
 
 class TestCaseTest extends TestCase
 {
@@ -14,6 +16,11 @@ class TestCaseTest extends TestCase
       $a = 5;
       $b = 3;
       $c = 7;
+
+      $errCode  = 100;
+      $errMsg   = "erreur automatique";
+      $err      = new TestMessageError($errMsg, $errCode);
+
       $this
         ->given(
           description: 'Soit trois nombres a,b et c',
@@ -43,14 +50,28 @@ class TestCaseTest extends TestCase
 
       $this
         ->given(
-          description:"Je veux effectuer un test avec un paramètre non déclaré dans le when()"
+          description:"Je veux effectuer un test avec un paramètre non déclaré dans le when()",
+          errCode: $errCode,
+          errMsg: $errMsg
         )
         ->when(
           description: "J'appelle un paramètre non déclaré",
-        callback: function($param) {  }
+          callback: function($param) {  }
         )
-
+        ->andWhen(
+          description: "Je personnalise le message d'erreur",
+          callback: function(TestGiven $whoami, string $errCode, string $errMsg) {
+            $whoami->addError($errMsg, $errCode);
+          }
+        )
         ->then(
+          description: "Je dois pouvoir retrouver le message d'erreur personnalisé",
+          callback: function(TestGiven $whoami) {
+            return (string)$whoami->getLastError();
+          },
+          result: (string)$err
+        )
+        ->andThen(
           description: "Le paramètre non déclaré doit être null",
           callback: function($param) { return $param; },
           result: null
