@@ -1,4 +1,5 @@
 <?php
+
 namespace FOPG\Component\UtilsBundle\Contracts;
 
 interface InvalidArgumentExceptionInterface {
