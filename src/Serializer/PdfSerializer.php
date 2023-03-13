@@ -3,6 +3,9 @@
 namespace FOPG\Component\UtilsBundle\Serializer;
 
 use FOPG\Component\UtilsBundle\ShellCommand\ShellCommand;
+use FOPG\Component\UtilsBundle\Contracts\Response\ResponseInterface;
+use FOPG\Component\UtilsBundle\Serializer\Response\BinaryFileResponse;
+use FOPG\Component\UtilsBundle\Serializer\Response\JsonResponse;
 
 class PdfSerializer extends AbstractSerializer
 {
@@ -10,6 +13,11 @@ class PdfSerializer extends AbstractSerializer
     return ["pdf"];
   }
 
+  public function render(): ResponseInterface {
+    /** @var ?string $file */
+    $file = $this->getFilename();
+    return ($file) ? new BinaryFileResponse($file) : new JsonResponse([], JsonResponse::HTTP_NOT_FOUND);
+  }
   /**
    * Extraction des pièces jointes depuis un PDF
    *
@@ -18,7 +26,7 @@ class PdfSerializer extends AbstractSerializer
    */
   public function getAssociatedFiles(): array
   {
-    /** @var string $file */
+    /** @var ?string $file */
     $file = $this->getFilename();
     /** @var string $tmpDir */
     $tmpDir = sys_get_temp_dir().'/'.uniqid();

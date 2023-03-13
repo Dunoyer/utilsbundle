@@ -21,7 +21,7 @@ abstract class AbstractSerializer implements SerializerInterface
      *
      * @return ?string
      */
-    public function getFilename(): string {
+    public function getFilename(): ?string {
       return $this->_filename;
     }
     /**

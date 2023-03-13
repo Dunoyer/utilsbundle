@@ -42,6 +42,43 @@ class SimpleHtmlDom extends SimpleHtmlBase{
         }
     }
 
+    public function toJson(): ?string {
+      $output = $this->toArray();
+      return (count($output)) ? json_encode($output, true) : null;
+    }
+
+    public function toArray(): array {
+      /** @var SimpleHtmlNode $whoami */
+      $whoami = $this->findOne("//*");
+      return self::_castArray($whoami);
+    }
+
+    private static function _castArray(SimpleHtmlNode $whoami): array {
+      $output = [
+        'tag' => $whoami->getTagName(),
+        'attributes' => $whoami->getAttributes(),
+        'children' => [],
+        'text' => '',
+      ];
+
+      /** @var SimpleHtmlDom $doc */
+      $doc = $whoami->getDoc();
+      /** @var ?\DOMXPath $nxpath */
+      $nxpath = $doc ? $doc->getXpath() : null;
+      /** @var ?\DOMNodeList $nl */
+      $nl = $nxpath ? $nxpath->query("./text()", $whoami->getNode()) : null;
+      $text = "";
+
+      if(null !== $nl)
+        for($i=0;$i<$nl->length;$i++)
+          $text.=$nl->item($i)->textContent;
+      $output['text']=trim($text);
+
+      foreach($whoami->findAll('./*') as $item)
+        $output['children'][]=self::_castArray($item);
+      return $output;
+    }
+
     /**
      * @param string $html
      * @param bool $is_xml
