@@ -5,6 +5,8 @@ namespace FOPG\Component\UtilsBundle\Serializer;
 use FOPG\Component\UtilsBundle\Contracts\SerializerInterface;
 use FOPG\Component\UtilsBundle\Exception\InvalidDirectoryException;
 use FOPG\Component\UtilsBundle\Exception\InvalidFilenameException;
+use FOPG\Component\UtilsBundle\Filesystem\Directory;
+use FOPG\Component\UtilsBundle\Filesystem\File;
 
 abstract class AbstractSerializer implements SerializerInterface
 {
@@ -16,6 +18,44 @@ abstract class AbstractSerializer implements SerializerInterface
       $this->_filename = $filename;
     }
 
+    private function setFilename(string $filename): self {
+      $this->_filename = $filename;
+    }
+
+    /**
+     * Récupération du nom de fichier épuré du répertoire associé
+     *
+     */
+    public function getBasename(): ?string {
+      $filename = $this->getFilename();
+      if(null !== $filename) {
+        $file = new File($filename);
+        return $file->getBasename();
+      }
+      return null;
+    }
+
+    /**
+     * Modifiction du nom de fichier
+     *
+     * Cette action entraîne une copie du document courant. Si le document est déjà
+     * existant, l'action est annulé et la méthode renvoit false.
+     *
+     * @param string $filename Nom du répertoire de sauvegarde
+     * @param bool $force Option d'écrasement si un document existe déjà à la destination
+     * @return bool La copie a t'elle pu s'opérer ?
+     */
+    public function rebaseAt(string $directory, bool $force=false): bool {
+      $dir = new Directory($directory, Directory::STRATEGY_YMD);
+      /** @var string $basename */
+      $basename = $this->getBasename();
+      /** @var string $newFilename */
+      $newFilename = (string)$dir.'/'.$basename;
+      $isValid = File::copy($this->getFilename(), $newFilename, $force);
+      if(true === $isValid)
+        $this->_filename = $newFilename;
+      return $isValid;
+    }
     /**
      * Récupération du fichier courant
      *
