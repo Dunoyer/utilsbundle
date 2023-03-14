@@ -2,9 +2,10 @@
 
 namespace FOPG\Component\UtilsBundle\Tests;
 
+use FOPG\Component\UtilsBundle\Env\Env;
+use FOPG\Component\UtilsBundle\Filesystem\File;
 use FOPG\Component\UtilsBundle\Serializer\PdfSerializer;
 use FOPG\Component\UtilsBundle\Serializer\XmlSerializer;
-use FOPG\Component\UtilsBundle\Filesystem\File;
 use FOPG\Component\UtilsBundle\ShellCommand\ShellCommand;
 use FOPG\Component\UtilsBundle\Test\TestCase;
 use FOPG\Component\UtilsBundle\Test\TestGiven;
@@ -19,6 +20,8 @@ class PdfSerializerTest extends TestCase
 
       /** @var string $directory Répertoire de stockage des PDF A3 */
       $directory = __DIR__.'/docs/serializer/pdf_serializer';
+      /** @var ?bool $ignoreWIP */
+      $ignoreWIP = Env::get("TEST__IGNORE_WIP") ? (bool)Env::get("TEST__IGNORE_WIP") : false;
 
       $this
         ->given(
@@ -62,7 +65,9 @@ class PdfSerializerTest extends TestCase
         ->given(
           description: "Contrôle du MERGE entre PDF",
           directory: $directory,
-          tmpDirectory: $tmpDirectory
+          tmpDirectory: $tmpDirectory,
+          test: $this,
+          ignoreWIP: $ignoreWIP
         )
         ->when(
           description: "Je récupére le seul PDF d'un répertoire",
@@ -101,6 +106,14 @@ class PdfSerializerTest extends TestCase
             $pdfToAppend = new PdfSerializer($oldFilename);
             $pdf->append($pdfToAppend);
           }
+        )
+        ->andThen(
+          description: "Le PDF est fusionné",
+          callback: function(PdfSerializer $pdf, PdfSerializerTest $test, bool $ignoreWIP) {
+            $test->debug("@todo - Méthode PdfSerializer::append() à développer");
+            return $ignoreWIP;
+          },
+          result: true
         )
       ;
     }

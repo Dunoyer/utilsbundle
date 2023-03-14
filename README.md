@@ -33,3 +33,11 @@ Rajouter le repository externe pour le bundle utils de la manière suivante :
 ``
 composer require friend-of-pastry-garden/utils-bundle
 ``
+
+Configuration des tests
+--
+
+Un ensemble de variables d'environnement servent à configurer l'exécution des tests
+| Variable | Description | Exemple |
+| -- | -- | -- |
+| TEST__IGNORE_WIP | Autorisation d'ignorer les développements en cours | true |

@@ -22,29 +22,9 @@ class PdfSerializer extends AbstractSerializer
    * @return self
    */
   public function append(PdfSerializer $pdf): self {
-    $current  = $this->getFilename();
-    $new      = $pdf->getFilename();
-
-    dump('@todo traiter la fusion de PDF ici');
-    die;
-    $fpdi = new Fpdi();
-    $pages = 0;
-    foreach([$current, $new] as $item) {
-      $count = $fpdi->setSourceFile($item);
-      for ($i = 1; $i <= $count; $i++) {
-        $template = $fpdi->importPage($i, \setasign\Fpdi\PdfReader\PageBoundaries::MEDIA_BOX);
-        $size = $fpdi->getTemplateSize($template);
-        $width = $size['width'];
-        $height = $size['height'];
-        $orientation = $size['orientation'];
-        $fpdi->AddPage($orientation, [$width, $heigth]);
-        $fpdi->useTemplate($template, 0, 0);
-      }
-    }
-    $newContent = @$fpdi->Output(null,"S");
-    unlink("/var/www/html/component/my_test.pdf");
-    file_put_contents("/var/www/html/component/my_test.pdf", $newContent);
-    die;
+    /**
+     * @todo Ajouter la méthode de fusion 
+     */
     return $this;
   }
 
