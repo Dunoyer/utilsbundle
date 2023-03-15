@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- DTD NATINF_1 VERSION 3 DU 20/10/2004 -->
+
+<!ELEMENT domnatinf_1 (Natinfs, NatinfRemplacantes?, NatinfAssociees?, FamilleVersions?, LienCirconstanceAggravantes?) >
+
+
+<!ELEMENT Natinfs (Natinf+) >
+	<!ELEMENT Natinf (NumeroNatinf, CodeNatureAffaire, NumeroDerniereVersion, DateCreation, (Annulation |Abrogation)?, Versions+)>
+		<!ELEMENT NumeroNatinf 						(#PCDATA)> 
+		<!ELEMENT CodeNatureAffaire					(#PCDATA)> 
+		<!ELEMENT NumeroDerniereVersion 				(#PCDATA)> 
+		<!ELEMENT DateCreation						(#PCDATA)> 
+		<!ELEMENT Annulation (DateAnnulation, CommentaireAnnulation, DateFermeture) >
+			<!ELEMENT DateAnnulation	 			(#PCDATA)> 
+			<!ELEMENT CommentaireAnnulation 			(#PCDATA)> 
+			<!ELEMENT DateFermeture		 			(#PCDATA)> 
+		<!ELEMENT Abrogation (DateAbrogation,LibelleTxtAbrogeant, DateFermeture) >
+			<!ELEMENT DateAbrogation	 			(#PCDATA)> 
+			<!ELEMENT LibelleTxtAbrogeant 				(#PCDATA)> 
+		<!ELEMENT Versions (Version+)>		
+			<!ELEMENT Version (NumeroVersion, MnemoZoneValidite?, CodeTypeInfractionPrincipale, CodeTypeInfractionSecondaire?, (NumeroStandardPrescriptionPeine | DureePrescriptionPeine), (NumeroStandardPrescriptionActionPublique|DureePrescriptionActionPublique) , NatureFaute, QualificationSimplifiee, Commentaire?, DateCreation, DateApplication, DateFinApplication?, LibelleTxtDefinissant, LibelleTxtReprimantGeneral, LibelleTxtOrigine, IndRecidiveGenerale, IndRecidiveSpecifique, IndTentativeGenerale, IndTentativeSpecifique,IndCompliciteOrdinaire, IndCompliciteSpecifique, DatesGestion, IndicateursMAJ, IndMAD)>
+			<!ELEMENT NumeroVersion 				(#PCDATA)> 
+			<!ELEMENT MnemoZoneValidite				(#PCDATA)> 
+			<!ELEMENT CodeTypeInfractionPrincipale 			(#PCDATA)> 
+			<!ELEMENT CodeTypeInfractionSecondaire			(#PCDATA)>
+			<!ELEMENT NumeroStandardPrescriptionPeine 		(#PCDATA)>  
+			<!ELEMENT DureePrescriptionPeine	 		(#PCDATA)> 
+			<!ELEMENT NumeroStandardPrescriptionActionPublique 	(#PCDATA)> 
+			<!ELEMENT DureePrescriptionActionPublique		(#PCDATA)>
+			<!ELEMENT NatureFaute			 		(#PCDATA)> 
+			<!ELEMENT QualificationSimplifiee	 		(#PCDATA)> 
+			<!ELEMENT Commentaire					(#PCDATA)>
+			<!ELEMENT DateApplication		 		(#PCDATA)> 
+			<!ELEMENT DateFinApplication		 		(#PCDATA)> 
+			<!ELEMENT LibelleTxtDefinissant				(#PCDATA)>
+			<!ELEMENT LibelleTxtReprimantGeneral	 		(#PCDATA)> 
+			<!ELEMENT LibelleTxtOrigine		 		(#PCDATA)> 
+			<!ELEMENT IndRecidiveGenerale		 		(#PCDATA)> 
+			<!ELEMENT IndRecidiveSpecifique		 		(#PCDATA)> 
+			<!ELEMENT IndTentativeGenerale		 		(#PCDATA)> 
+			<!ELEMENT IndTentativeSpecifique	 		(#PCDATA)> 
+			<!ELEMENT IndCompliciteOrdinaire	 		(#PCDATA)> 
+			<!ELEMENT IndCompliciteSpecifique	 		(#PCDATA)> 
+			<!ELEMENT DatesGestion (DateElaboration ,DateDemandeMAD, DateMAD, DateDemandeVerif, DateVerif)> 
+				<!ELEMENT DateElaboration 	 		(#PCDATA)> 
+				<!ELEMENT DateDemandeMAD 	 		(#PCDATA)> 
+				<!ELEMENT DateMAD	 	 		(#PCDATA)> 
+				<!ELEMENT DateDemandeVerif 	 		(#PCDATA)> 
+				<!ELEMENT DateVerif 	 			(#PCDATA)> 
+			<!ELEMENT IndicateursMAJ (MAJQualificationSimplifiee, MAJTxt, MAJPeine, MAJCodeTypeInfraction, MAJPrescriptionPeineActionPublique, MAJCommentaire)> 
+				<!ELEMENT MAJQualificationSimplifiee		(#PCDATA)> 
+				<!ELEMENT MAJTxt 	 			(#PCDATA)> 
+				<!ELEMENT MAJPeine 	 			(#PCDATA)> 
+				<!ELEMENT MAJCodeTypeInfraction			(#PCDATA)> 
+				<!ELEMENT MAJPrescriptionPeineActionPublique	(#PCDATA)> 
+				<!ELEMENT MAJCommentaire 			(#PCDATA)> 
+			<!ELEMENT IndMAD			 		(#PCDATA)> 
+	 
+
+<!ELEMENT NatinfAssociees (NatinfAssociee+)>
+	<!ELEMENT NatinfAssociee (NumeroNatinfBase,NumeroVersionBase, NumeroNatinfAssociee, ModeParticipation)>
+		<!ELEMENT NumeroNatinfBase					(#PCDATA)> 
+		<!ELEMENT NumeroVersionBase					(#PCDATA)> 
+		<!ELEMENT NumeroNatinfAssociee					(#PCDATA)> 
+		<!ELEMENT ModeParticipation					(#PCDATA)>   
+
+<!ELEMENT NatinfRemplacantes (NatinfRemplacante+)>
+	<!ELEMENT NatinfRemplacante (NumeroNatinfRemplace, NumeroNatinfRemplacante, DateRemplacement)>
+		<!ELEMENT NumeroNatinfRemplace							(#PCDATA)> 
+		<!ELEMENT NumeroNatinfRemplacante						(#PCDATA)> 
+		<!ELEMENT DateRemplacement									(#PCDATA)>     
+
+<!ELEMENT FamilleVersions (FamilleVersion+)>
+	<!ELEMENT FamilleVersion (NumeroNatinf, NumeroVersion, MnemoFamilleNatinf, NatureLienFamille, ModeAffectation, DateFinApplication?)>
+		<!ELEMENT MnemoFamilleNatinf									(#PCDATA)>        
+		<!ELEMENT NatureLienFamille										(#PCDATA)> 
+		<!ELEMENT ModeAffectation										(#PCDATA)> 
+
+<!ELEMENT LienCirconstanceAggravantes (LienCirconstanceAggravante+)>
+	<!ELEMENT LienCirconstanceAggravante (NumeroNatinf, CodeCirconstanceAggravante)>
+		<!ELEMENT CodeCirconstanceAggravante				(#PCDATA)>        

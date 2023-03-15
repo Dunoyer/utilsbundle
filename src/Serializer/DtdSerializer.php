@@ -3,6 +3,7 @@
 namespace FOPG\Component\UtilsBundle\Serializer;
 
 use FOPG\Component\UtilsBundle\Contracts\Response\ResponseInterface;
+use FOPG\Component\UtilsBundle\Serializer\Dtd\DtdClass;
 use FOPG\Component\UtilsBundle\Serializer\Response\JsonResponse;
 
 class DtdSerializer extends AbstractSerializer
