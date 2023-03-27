@@ -53,13 +53,13 @@ $this
     description: "L'opérateur > doit être booléen et égal à true",
     callback: function($opSup){ return $opSup; },
     result: true,
-    onFail: function(TestGiven $whoami) { $whoami->addError("le > n'est pas bon!", 101) }
+    onFail: function(TestGiven $whoami) { $whoami->addError("le > n'est pas bon!", 101); }
   )
   ->andThen(
     description: "L'opérateur < doit être booléen et égal à true",
     callback: function($opInf){ return $opInf; },
     result: true,
-    onFail: function(TestGiven $whoami) { $whoami->addError("le < n'est pas bon!", 101) }
+    onFail: function(TestGiven $whoami) { $whoami->addError("le < n'est pas bon!", 101); }
   )
 ;
 ```
