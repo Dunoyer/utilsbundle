@@ -27,6 +27,7 @@ class Collection {
   public function getKeys(): array {
     return $this->_keys;
   }
+
   public function __toString(): string {
     /** @var \Ds\Set $keys */
     $keys = implode(",",$this->_keys);
@@ -62,5 +63,27 @@ class Collection {
       $this->permute($i, $rand);
     }
     return $this;
+  }
+
+  /**
+   * Récupération de l'instance positionné en index-ème position
+   *
+   * Il y'a renvoi de null si l'index n'est pas reconnu
+   * @param int $index
+   * @return mixed
+   */
+  public function get(int $index): mixed {
+    /** @var mixed $realIndex */
+    $realIndex = $this->_keys[$index] ?? null;
+    return (null !== $realIndex) ? $this->_map->get($realIndex) : null;
+  }
+
+  /**
+   * Récupération du nombre d'éléments dans la collection
+   *
+   * @return int
+   */
+  public function count(): int {
+    return count($this->_keys);
   }
 }

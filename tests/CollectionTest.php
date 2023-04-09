@@ -80,7 +80,22 @@ class CollectionTest extends TestCase
           },
           result: true
         )
+        ->andThen(
+          description: "La correspondance entre clé et l'objet associé doit être confirmé",
+          callback: function(Collection $collection) {
+            /** @var array $sort */
+            $sort = $collection->getKeys();
+            /** @var bool $check */
+            $check = true;
+            for($i=0;$i< $collection->count();$i++) {
+              /** @var ?FakeClass $obj */
+              $obj = $collection->get($i);
+              $check = $check && ($sort[$i] === $obj->getId());
+            }
+            return $check;
+          },
+          result: true
+        )
       ;
-      die;
     }
 }
