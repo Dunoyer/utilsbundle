@@ -13,7 +13,7 @@ class CollectionTest extends TestCase
 
     public function testCollectionBasis(): void {
 
-      $max = 100001;
+      $max = 1000001;
       $tab = [];
       $correctTab = [];
       for($i=1;$i<=$max;$i++) {
