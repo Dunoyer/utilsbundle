@@ -47,8 +47,10 @@ class CollectionTest extends TestCase
           callback: function(array $tab, ?Collection &$collection=null) {
             $collection = new Collection(
               $tab,
-              function($index, $item) { return $item->getId(); },
-              function($keyA, $keyB) { return ($keyA<$keyB); }
+              /** Fonction d'identification de la valeur de tri */
+              function(int $index, FakeClass $item): int { return $item->getId(); },
+              /** Fonction de comparaison pour le tri */
+              function(int $keyA, int $keyB): bool { return ($keyA<$keyB); }
             );
           }
         )
