@@ -15,7 +15,7 @@ class CollectionTest extends TestCase
 
       $tab = [];
       $correctTab = [];
-      for($i=1;$i<=100;$i++) {
+      for($i=1;$i<=103;$i++) {
         $tab[]=new FakeClass($i,"label $i");
         $correctTab[]=$i;
       }
@@ -23,6 +23,18 @@ class CollectionTest extends TestCase
       $correctTab[1] = 5;
       $correctTab[4] = 2;
       $correctPermutation= "<".implode(",",$correctTab).">";
+
+      $correctTab[2] = 2;
+      $correctTab[3] = 3;
+      $correctTab[4] = 4;
+
+      $correctinsertLastToLeft= "<".implode(",",$correctTab).">";
+
+      $orderedTab = [];
+      for($i=1;$i<=103;$i++)
+        $orderedTab[]=$i;
+      $correctOrdered= "<".implode(",",$orderedTab).">";
+
       $this->section(self::SECTION_HEADER.' Contrôle des manipulations triviales d\'une collection');
 
       $this
@@ -33,16 +45,36 @@ class CollectionTest extends TestCase
         ->when(
           description: "J'intégre le tableau dans le gestionnaire de collection ou la clé utilisée est l'identifiant",
           callback: function(array $tab, ?Collection &$collection=null) {
-            $collection = new Collection($tab, function($index, $item) { return $item->getId(); });
+            $collection = new Collection(
+              $tab,
+              function($index, $item) { return $item->getId(); },
+              function($keyA, $keyB) { return ($keyA<$keyB); }
+            );
           }
+        )
+        ->andWhen(
+          description: "Je déplace l'index 10 à la 2ème position",
+          callback: function(Collection $collection) {
+            $collection->insertLastToLeft(2,5);
+          }
+        )
+        ->then(
+          description: "Le 10ème index doit être à la 2ème position, les éléments 2 à 9 sont décalés vers la droite",
+          callback: function(Collection $collection) {
+            return (string)$collection;
+          },
+          result: $correctinsertLastToLeft
         )
         ->andWhen(
           description: "Je permute l'index 2 et l'index 5",
           callback: function(Collection $collection, ?bool &$result=null) {
+            $collection->insertLastToLeft(5,4);
+            $collection->insertLastToLeft(4,3);
+            $collection->insertLastToLeft(3,2);
             $result = $collection->permute(2,5);
           }
         )
-        ->then(
+        ->andThen(
           description: "La permutation doit être effective",
           callback: function(Collection $collection, bool $result) {
             if(true === $result)
@@ -95,6 +127,19 @@ class CollectionTest extends TestCase
             return $check;
           },
           result: true
+        )
+        ->andWhen(
+          description: "Je fais un tri par fusion",
+          callback: function(Collection $collection) {
+            $collection->mergeSort();
+          }
+        )
+        ->andThen(
+          description: "Le tableau est bien ordonné",
+          callback: function(Collection $collection) {
+            return (string)$collection;
+          },
+          result: $correctOrdered
         )
       ;
     }
