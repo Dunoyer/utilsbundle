@@ -101,7 +101,8 @@ class CollectionTest extends TestCase
             /** @var float $distance */
             $distance = 0;
             for($i=1;$i<count($sort);$i++)
-              $distance+=($i-$sort[$i])*($i-$sort[$i]);
+              if(($i-$sort[$i])*($i-$sort[$i])> 1)
+                $distance+=2;
             /**
              * @author yroussel
              *
