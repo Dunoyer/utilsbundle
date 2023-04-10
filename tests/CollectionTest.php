@@ -13,9 +13,10 @@ class CollectionTest extends TestCase
 
     public function testCollectionBasis(): void {
 
+      $max = 1001;
       $tab = [];
       $correctTab = [];
-      for($i=1;$i<=103;$i++) {
+      for($i=1;$i<=$max;$i++) {
         $tab[]=new FakeClass($i,"label $i");
         $correctTab[]=$i;
       }
@@ -31,7 +32,7 @@ class CollectionTest extends TestCase
       $correctinsertLastToLeft= "<".implode(",",$correctTab).">";
 
       $orderedTab = [];
-      for($i=1;$i<=103;$i++)
+      for($i=1;$i<=$max;$i++)
         $orderedTab[]=$i;
       $correctOrdered= "<".implode(",",$orderedTab).">";
 

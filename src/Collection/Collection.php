@@ -2,11 +2,9 @@
 
 namespace FOPG\Component\UtilsBundle\Collection;
 
-use \Ds\Map as DsMap;
-
 class Collection {
 
-  private ?DsMap $_map = null;
+  private array $_values = [];
   private array $_keys = [];
   private $_callback = null;
   private $_cmpAlgorithm = null;
@@ -20,8 +18,6 @@ class Collection {
    */
   public function __construct(array $array, ?Callable $callback=null, ?Callable $cmpAlgorithm=null) {
 
-    $this->_map = new DsMap();
-
     if(null === $callback)
       $callback = function($index, $item) { return $index; };
     $this->_callback = $callback;
@@ -33,14 +29,10 @@ class Collection {
     foreach($array as $index => $item) {
       /** @var mixed $realIndex */
       $realIndex = $callback($index, $item);
-      $this->_map->put($realIndex, $item);
+      $this->_values[$realIndex] = $item;
       if(!in_array($realIndex, $this->_keys))
         $this->_keys[]=$realIndex;
     }
-  }
-
-  public function getMap(): ?DsMap {
-    return $this->_map;
   }
 
   public function getKeys(): array {
@@ -48,7 +40,7 @@ class Collection {
   }
 
   public function __toString(): string {
-    /** @var \Ds\Set $keys */
+    /** @var string $keys */
     $keys = implode(",",$this->_keys);
     return "<".$keys.">";
   }
@@ -117,7 +109,7 @@ class Collection {
   public function get(int $index): mixed {
     /** @var mixed $realIndex */
     $realIndex = $this->_keys[$index] ?? null;
-    return (null !== $realIndex) ? $this->_map->get($realIndex) : null;
+    return (null !== $realIndex) ? $this->_values[$realIndex] : null;
   }
 
   /**
