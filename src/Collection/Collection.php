@@ -136,6 +136,29 @@ class Collection {
     return $this;
   }
 
+  /**
+   * Tri par insertion
+   *
+   * Compléxité : O(n^2)
+   */
+  public function insertionSort(): self {
+    $first = 1;
+    $last = count($this->_keys);
+    $cmpAlgorithm = $this->_cmpAlgorithm;
+
+    for($i=$first;$i<$last;$i++) {
+      $current = $this->_keys[$i];
+      $j=$i;
+      while($j>0 && (false === $cmpAlgorithm($this->_keys[$j-1], $current))) {
+        $this->_keys[$j] = $this->_keys[$j-1];
+        $j--;
+      }
+      $this->_keys[$j]=$current;
+    }
+
+    return $this;
+  }
+
   private function _makeSubMergeSort(int $i, int $j): void {
 
     $cmpAlgorithm = $this->_cmpAlgorithm;

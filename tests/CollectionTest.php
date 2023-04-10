@@ -13,7 +13,7 @@ class CollectionTest extends TestCase
 
     public function testCollectionBasis(): void {
 
-      $max = 1000001;
+      $max = 1000;
       $tab = [];
       $correctTab = [];
       for($i=1;$i<=$max;$i++) {
@@ -41,7 +41,8 @@ class CollectionTest extends TestCase
       $this
         ->given(
           description: 'Contrôle des fonctions de base d\'une collection sur un tableau d\'instances de classe',
-          tab: $tab
+          tab: $tab,
+          correctOrdered: $correctOrdered
         )
         ->when(
           description: "J'intégre le tableau dans le gestionnaire de collection ou la clé utilisée est l'identifiant",
@@ -141,6 +142,20 @@ class CollectionTest extends TestCase
         ->andThen(
           description: "Le tableau est bien ordonné",
           callback: function(Collection $collection) {
+            return (string)$collection;
+          },
+          result: $correctOrdered
+        )
+        ->andWhen(
+          description: "Je souhaite effectuer un tri par insertion",
+          callback: function(Collection $collection) {
+            $collection->shuffle();
+            $collection->insertionSort();
+          }
+        )
+        ->andThen(
+          description: "Le tableau est bien ordonné",
+          callback: function(Collection $collection, string $correctOrdered) {
             return (string)$collection;
           },
           result: $correctOrdered
