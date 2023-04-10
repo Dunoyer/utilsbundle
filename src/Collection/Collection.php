@@ -30,8 +30,7 @@ class Collection {
       /** @var mixed $realIndex */
       $realIndex = $callback($index, $item);
       $this->_values[$realIndex] = $item;
-      if(!in_array($realIndex, $this->_keys))
-        $this->_keys[]=$realIndex;
+      $this->_keys[]=$realIndex;
     }
   }
 
@@ -91,10 +90,12 @@ class Collection {
    *
    */
   public function shuffle(): self {
-    $len = count($this->_keys);
-    for($i=0;$i<=$len-1;$i++) {
-      $rand = rand($i,$len);
-      $this->permute($i, $rand);
+    $last = count($this->_keys)-1;
+    for($i=0;$i<=$last;$i++) {
+      $rand = rand($i,$last);
+      $tmp = $this->_keys[$i];
+      $this->_keys[$i] = $this->_keys[$rand];
+      $this->_keys[$rand] = $tmp;
     }
     return $this;
   }
@@ -155,6 +156,7 @@ class Collection {
     for($w=$h+1;$w<=$j;$w++)
       $right[]=$this->_keys[$w];
 
+    $current = $i;
     $w=0;
     $z=0;
 
@@ -164,15 +166,34 @@ class Collection {
       /** @var ?int $indR */
       $indR = $right[$z] ?? null;
 
-      if(null === $indL || null === $indR)
+      if(null === $indL) {
+        do {
+          $this->_keys[$current]=$indR;
+          $z++;
+          $current++;
+        }
+        while(null !== ($indR = $right[$z] ?? null));
         return;
+      }
+      if(null === $indR) {
+        do {
+          $this->_keys[$current]=$indL;
+          $w++;
+          $current++;
+        }
+        while(null !== ($indL = $left[$w] ?? null));
+        return;
+      }
 
-      if(true === $cmpAlgorithm($indL, $indR))
+      if(true === $cmpAlgorithm($indL, $indR)) {
+        $this->_keys[$current]=$indL;
         $w++;
+      }
       else {
-        $this->insertLastToLeft($indL,$indR);
+        $this->_keys[$current]=$indR;
         $z++;
       }
+      $current++;
     }
     while(true);
   }
