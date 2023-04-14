@@ -137,6 +137,53 @@ class Collection {
   }
 
   /**
+   * tri par tas
+   *
+   * Compléxité : O(n lg n)
+   */
+  public function heapSort(): self {
+    $len = count($this->_keys);
+    $size = $len-1;
+
+    for($i=(int)($size/2);$i>=0;$i--) {
+      $parent = (int)(($i-1)/2);
+      $h = $i;
+      $cmpAlgorithm = $this->_cmpAlgorithm;
+      $this->_makeSubHeapSort($h, $size);
+    }
+    return $this;
+  }
+
+  /**
+   * Méthode de déplacement d'une valeur i
+   *
+   * @param int $i
+   * @param int $size
+   */
+  private function _makeSubHeapSort(int $i, int $size): void {
+    /** @var int $left */
+    $left = (2*$i)+1;
+    /** @var int $right */
+    $right= $left+1;
+    /** @var Callable $cmpAlgorithm */
+    $cmpAlgorithm = $this->_cmpAlgorithm;
+    $max = $i;
+
+    if(($left <= $size) && (true === $cmpAlgorithm($this->_keys[$left], $this->_keys[$max])))
+      $max = $left;
+
+    if(($right <= $size) && (true === $cmpAlgorithm($this->_keys[$right], $this->_keys[$max])))
+      $max = $right;
+    if($max !== $i) {
+      $tmp = $this->_keys[$max];
+      $this->_keys[$max] = $this->_keys[$i];
+      $this->_keys[$i] = $tmp;
+
+      $this->_makeSubHeapSort($max, $size);
+    }
+  }
+
+  /**
    * Tri par insertion
    *
    * Compléxité : O(n^2)

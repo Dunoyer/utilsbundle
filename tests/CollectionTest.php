@@ -161,5 +161,50 @@ class CollectionTest extends TestCase
           result: $correctOrdered
         )
       ;
+
+      $tab = [];
+      for($i=1;$i<=100;$i++)
+        $tab[$i]=$i;
+
+      /** Fonction de comparaison pour le tri */
+      $cmpAlgorithm = function(int $keyA, int $keyB): bool { return ($keyA>$keyB); };
+
+      $this
+        ->given(
+          description: 'Contrôle algorithmique du tri par tas',
+          tab: $tab,
+          cmpAlgorithm: $cmpAlgorithm
+        )
+        ->when(
+          description: "Je souhaite effectuer un tri par tas",
+          callback: function(?Collection &$collection=null, array $tab, Callable $cmpAlgorithm) {
+            $collection = new Collection($tab, function(int $index, int $value): int { return $value; },$cmpAlgorithm);
+            $collection->shuffle();
+            $collection->heapSort();
+          }
+        )
+        ->then(
+          description: "La relation de grandeur parent-enfant doit être respectée",
+          callback: function(Collection $collection, Callable $cmpAlgorithm) {
+            $check = true;
+            for($i=1;$i<$collection->count();$i++) {
+              $parent = (int)(($i-1)/2);
+              $childValue = $collection->get($i);
+              $parentValue = $collection->get($parent);
+              $check = $check && $cmpAlgorithm($parentValue, $childValue);
+            }
+            return $check;
+          },
+          result: true
+        )
+        ->andThen(
+          description: "Le tri doit être bon",
+          callback: function(Collection $collection) {
+            dump("ici");die;
+            return true;
+          },
+          result: true
+        )
+      ;
     }
 }
