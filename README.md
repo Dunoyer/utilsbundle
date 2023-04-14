@@ -6,6 +6,7 @@ Introduction
 L'objectif du composant est de fournir un ensemble d'outils trop limité pour disposer de leur propre bundle.
 
 Les outils compris dans le module sont :
+* [Collection](/docs/collection.md) - librairie traitant la manipulation des tableaux
 * [SimpleHtml](/docs/simpleHtml.md) - librairie permettant l'exploration simplifiée d'un document HTML
 * [TestCase](/docs/testCase.md) - surcharge du composant natif Symfony TestCase pour un pilotage des tests unitaire dans le respect du Domain Driven Design
 * [Uri](/docs/uri.md) - librairie de manipulation d'URI
@@ -38,6 +39,7 @@ Configuration des tests
 --
 
 Un ensemble de variables d'environnement servent à configurer l'exécution des tests
+
 | Variable | Description | Exemple |
 | -- | -- | -- |
 | TEST__IGNORE_WIP | Autorisation d'ignorer les développements en cours | true |
