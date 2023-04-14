@@ -34,6 +34,10 @@ class Collection {
     }
   }
 
+  public function getCmpAlgorithm(): Callable {
+    return $this->_cmpAlgorithm;
+  }
+
   public function getKeys(): array {
     return $this->_keys;
   }
@@ -151,6 +155,15 @@ class Collection {
       $cmpAlgorithm = $this->_cmpAlgorithm;
       $this->_makeSubHeapSort($h, $size);
     }
+
+    for($i=$size;$i>0;$i--) {
+      $tmp = $this->_keys[$i];
+      $this->_keys[$i] = $this->_keys[0];
+      $this->_keys[0] = $tmp;
+      $this->_makeSubHeapSort(0, $i-1);
+    }
+    $this->_keys = array_reverse($this->_keys);
+
     return $this;
   }
 

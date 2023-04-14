@@ -13,7 +13,7 @@ class CollectionTest extends TestCase
 
     public function testCollectionBasis(): void {
 
-      $max = 1000;
+      $max = 10000;
       $tab = [];
       $correctTab = [];
       for($i=1;$i<=$max;$i++) {
@@ -135,8 +135,10 @@ class CollectionTest extends TestCase
         )
         ->andWhen(
           description: "Je fais un tri par fusion",
-          callback: function(Collection $collection) {
+          callback: function(Collection $collection, ?float &$timeOnMergeSort=null) {
+            $time = microtime(true);
             $collection->mergeSort();
+            $timeOnMergeSort = microtime(true)-$time;
           }
         )
         ->andThen(
@@ -147,63 +149,54 @@ class CollectionTest extends TestCase
           result: $correctOrdered
         )
         ->andWhen(
-          description: "Je souhaite effectuer un tri par insertion",
-          callback: function(Collection $collection) {
-            $collection->shuffle();
-            $collection->insertionSort();
-          }
-        )
-        ->andThen(
-          description: "Le tableau est bien ordonné",
-          callback: function(Collection $collection, string $correctOrdered) {
-            return (string)$collection;
-          },
-          result: $correctOrdered
-        )
-      ;
-
-      $tab = [];
-      for($i=1;$i<=100;$i++)
-        $tab[$i]=$i;
-
-      /** Fonction de comparaison pour le tri */
-      $cmpAlgorithm = function(int $keyA, int $keyB): bool { return ($keyA>$keyB); };
-
-      $this
-        ->given(
-          description: 'Contrôle algorithmique du tri par tas',
-          tab: $tab,
-          cmpAlgorithm: $cmpAlgorithm
-        )
-        ->when(
           description: "Je souhaite effectuer un tri par tas",
-          callback: function(?Collection &$collection=null, array $tab, Callable $cmpAlgorithm) {
-            $collection = new Collection($tab, function(int $index, int $value): int { return $value; },$cmpAlgorithm);
+          callback: function(Collection $collection, ?float &$timeOnHeapSort=null) {
             $collection->shuffle();
+            $time = microtime(true);
             $collection->heapSort();
+            $timeOnHeapSort = microtime(true)-$time;
           }
-        )
-        ->then(
-          description: "La relation de grandeur parent-enfant doit être respectée",
-          callback: function(Collection $collection, Callable $cmpAlgorithm) {
-            $check = true;
-            for($i=1;$i<$collection->count();$i++) {
-              $parent = (int)(($i-1)/2);
-              $childValue = $collection->get($i);
-              $parentValue = $collection->get($parent);
-              $check = $check && $cmpAlgorithm($parentValue, $childValue);
-            }
-            return $check;
-          },
-          result: true
         )
         ->andThen(
           description: "Le tri doit être bon",
           callback: function(Collection $collection) {
-            dump("ici");die;
-            return true;
+            return (string)$collection;
+          },
+          result: $correctOrdered
+        )
+        ->andThen(
+          description: "Le tri par fusion est plus rapide que le tri par tas d'un multiple de 2",
+          callback: function(float $timeOnMergeSort, float $timeOnHeapSort) {
+            $check = ($timeOnMergeSort < $timeOnHeapSort) && (3*$timeOnMergeSort > $timeOnHeapSort);
+            return $check;
           },
           result: true
+        )
+      ;
+
+      $tab=[];
+      for($i=0;$i>100;$i++)
+        $tab[$i]=$i;
+      $correctOrdered = "<".implode(",",$tab).">";
+      $this
+        ->given(
+          description: "Contrôle du tri par insertion",
+          tab: $tab
+        )
+        ->when(
+          description: "Je souhaite effectuer un tri par insertion",
+          callback: function(array $tab, ?Collection &$collection=null) {
+            $collection = new Collection($tab);
+            $collection->shuffle();
+            $collection->insertionSort();
+          }
+        )
+        ->then(
+          description: "Le tableau est bien ordonné",
+          callback: function(Collection $collection) {
+            return (string)$collection;
+          },
+          result: $correctOrdered
         )
       ;
     }
