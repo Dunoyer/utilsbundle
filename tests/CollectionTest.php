@@ -199,5 +199,47 @@ class CollectionTest extends TestCase
           result: $correctOrdered
         )
       ;
+
+      $tab = ["a" => 1, "b" => 2, 3 => "a", 4 => "b"];
+
+      $this
+        ->given(
+          description: "Contrôle des ajouts/suppression de la collection",
+          tab: $tab
+        )
+        ->when(
+          description: "Je souhaite ajouter de nouvelle valeur au tableau",
+          callback: function(array $tab, ?Collection &$collection=null) {
+            $collection = new Collection(
+              $tab,
+              function($index, $item) { return $index; },
+              function($a, $b) {
+                if(is_string($a) && is_string($b)) { return (strcmp($a, $b) > 0); }
+                elseif(is_string($a)) { return false; }
+                elseif(is_string($b)) { return true; }
+                else { return ($a > $b); }
+              }
+            );
+            $collection->add("z", 5);
+            $collection->add(5, "z");
+            $collection->shuffle();
+            $collection->heapSort();
+          }
+        )
+        ->then(
+          description: "La collection est bien ordonnée",
+          callback: function(Collection $collection) { return (string)$collection; },
+          result: "<5,4,3,z,b,a>"
+        )
+        ->andWhen(
+          description: "Je souhaite supprimer une valeur au tableau",
+          callback: function(Collection $collection) { $collection->remove("z"); }
+        )
+        ->andThen(
+          description: "La structure du tableau doit être conservée",
+          callback: function(Collection $collection) { return (string)$collection; },
+          result: "<5,4,3,b,a>"
+        )
+      ;
     }
 }

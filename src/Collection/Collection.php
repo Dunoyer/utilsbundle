@@ -16,7 +16,7 @@ class Collection {
    * @param ?Callable $callback Fonction d'extraction de l'index
    * @param ?Callable $cmpAlgorithm Méthode de comparaison sur les index
    */
-  public function __construct(array $array, ?Callable $callback=null, ?Callable $cmpAlgorithm=null) {
+  public function __construct(array $array=[], ?Callable $callback=null, ?Callable $cmpAlgorithm=null) {
 
     if(null === $callback)
       $callback = function($index, $item) { return $index; };
@@ -32,6 +32,27 @@ class Collection {
       $this->_values[$realIndex] = $item;
       $this->_keys[]=$realIndex;
     }
+  }
+
+  public function remove(mixed $index): bool {
+    /** @var int|false $keyIndex */
+    $keyIndex = array_search($index, $this->_keys);
+    if(false === $keyIndex)
+      return false;
+    /** @var int $size */
+    $size = count($this->_keys);
+    for($i = $keyIndex; $i<$size;$i++) {
+      $this->_keys[$i]=$this->_keys[$i+1];
+    }
+    unset($this->_keys[$size-1]);
+    return true;
+  }
+  public function add(mixed $item, mixed $index=null): self {
+    $callback = $this->_callback;
+    $realIndex = $callback($index, $item);
+    $this->_values[$realIndex] = $item;
+    $this->_keys[]=$realIndex;
+    return $this;
   }
 
   public function getCmpAlgorithm(): Callable {
