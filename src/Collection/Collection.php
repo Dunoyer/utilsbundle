@@ -34,6 +34,12 @@ class Collection {
     }
   }
 
+  /**
+   * Suppression d'un élément du tableau
+   *
+   * @param mixed $index Valeur d'index à rechercher pour suppression
+   * @return bool
+   */
   public function remove(mixed $index): bool {
     /** @var int|false $keyIndex */
     $keyIndex = array_search($index, $this->_keys);
@@ -41,17 +47,33 @@ class Collection {
       return false;
     /** @var int $size */
     $size = count($this->_keys);
-    for($i = $keyIndex; $i<$size;$i++) {
+    /** @var mixed $tmp */
+    $tmp = $this->_keys[$keyIndex];
+    unset($this->_values[$tmp]);
+    /** @var int $i */
+    for($i = $keyIndex; $i<$size;$i++)
       $this->_keys[$i]=$this->_keys[$i+1];
-    }
     unset($this->_keys[$size-1]);
     return true;
   }
-  public function add(mixed $item, mixed $index=null): self {
+
+  /**
+   * Ajout d'un élément au tableau
+   *
+   * @param mixed $item
+   * @param mixed $index
+   * @param bool $includeSort Option qui impose que la valeur ajoutée respecte le tri du tableau
+   * @return self
+   */
+  public function add(mixed $item, mixed $index=null, bool $includeSort = false): self {
     $callback = $this->_callback;
     $realIndex = $callback($index, $item);
     $this->_values[$realIndex] = $item;
-    $this->_keys[]=$realIndex;
+    $this->_keys[count($this->_keys)]=$realIndex;
+    if(true === $includeSort) {
+      $last = count($this->_keys)-1;
+      $this->insertionSort($last);
+    }
     return $this;
   }
 
@@ -61,6 +83,19 @@ class Collection {
 
   public function getKeys(): array {
     return $this->_keys;
+  }
+
+  /**
+   * Récupération des valeurs triés
+   *
+   * @return array
+   */
+  public function getValues(): array {
+    $tab=[];
+    for($i=0;$i<$this->count();$i++) {
+      $tab[]=$this->get($i);
+    }
+    return $tab;
   }
 
   public function __toString(): string {
@@ -221,9 +256,10 @@ class Collection {
    * Tri par insertion
    *
    * Compléxité : O(n^2)
+   *
+   * @param int $first
    */
-  public function insertionSort(): self {
-    $first = 1;
+  public function insertionSort(int $first=1): self {
     $last = count($this->_keys);
     $cmpAlgorithm = $this->_cmpAlgorithm;
 

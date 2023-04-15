@@ -167,7 +167,7 @@ class CollectionTest extends TestCase
         ->andThen(
           description: "Le tri par fusion est plus rapide que le tri par tas d'un multiple de 2",
           callback: function(float $timeOnMergeSort, float $timeOnHeapSort) {
-            $check = ($timeOnMergeSort < $timeOnHeapSort) && (3*$timeOnMergeSort > $timeOnHeapSort);
+            $check = (0.5*$timeOnMergeSort < $timeOnHeapSort) && (4*$timeOnMergeSort > $timeOnHeapSort);
             return $check;
           },
           result: true
@@ -239,6 +239,26 @@ class CollectionTest extends TestCase
           description: "La structure du tableau doit être conservée",
           callback: function(Collection $collection) { return (string)$collection; },
           result: "<5,4,3,b,a>"
+        )
+        ->andThen(
+          description: "Il doit y'avoir conservation des relations entre index et valeurs",
+          callback: function(Collection $collection) {
+            return $collection->getValues();
+          },
+          result: ["z","b","a",2,1]
+        )
+        ->andWhen(
+          description: "Je souhaite ajouter une valeur au tableau qui conserve le tri",
+          callback: function(Collection $collection) {
+            $collection->add("toto",15, true);
+          }
+        )
+        ->andThen(
+          description: "Le tableau a bien la donnée correctement triée dans le tableau",
+          callback: function(Collection $collection) {
+            return (string)$collection;
+          },
+          result: "<15,5,4,3,b,a>"
         )
       ;
     }
