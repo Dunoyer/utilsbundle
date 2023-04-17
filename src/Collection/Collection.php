@@ -2,10 +2,12 @@
 
 namespace FOPG\Component\UtilsBundle\Collection;
 
-class Collection {
+use FOPG\Component\UtilsBundle\Contracts\CollectionInterface;
+
+class Collection implements CollectionInterface {
 
   private array $_values = [];
-  private array $_keys = [];
+  protected array $_keys = [];
   private $_callback = null;
   private $_cmpAlgorithm = null;
 
@@ -65,7 +67,7 @@ class Collection {
    * @param bool $includeSort Option qui impose que la valeur ajoutée respecte le tri du tableau
    * @return self
    */
-  public function add(mixed $item, mixed $index=null, bool $includeSort = false): self {
+  public function add(mixed $item, mixed $index=null, bool $includeSort = false): CollectionInterface {
     $callback = $this->_callback;
     $realIndex = $callback($index, $item);
     $this->_values[$realIndex] = $item;
@@ -167,7 +169,7 @@ class Collection {
    * @param int $index
    * @return mixed
    */
-  public function get(int $index): mixed {
+  public function get(int $index=null): mixed {
     /** @var mixed $realIndex */
     $realIndex = $this->_keys[$index] ?? null;
     return (null !== $realIndex) ? $this->_values[$realIndex] : null;
@@ -197,11 +199,11 @@ class Collection {
   }
 
   /**
-   * tri par tas
+   * Processus d'initialisation du tri par tas
    *
-   * Compléxité : O(n lg n)
+   * @return self
    */
-  public function heapSort(): self {
+  protected function _initHeapSort(): self {
     $len = count($this->_keys);
     $size = $len-1;
 
@@ -211,6 +213,19 @@ class Collection {
       $cmpAlgorithm = $this->_cmpAlgorithm;
       $this->_makeSubHeapSort($h, $size);
     }
+    return $this;
+  }
+
+  /**
+   * tri par tas
+   *
+   * Compléxité : O(n lg n)
+   */
+  public function heapSort(): self {
+    $len = count($this->_keys);
+    $size = $len-1;
+
+    $this->_initHeapSort();
 
     for($i=$size;$i>0;$i--) {
       $tmp = $this->_keys[$i];
@@ -229,7 +244,7 @@ class Collection {
    * @param int $i
    * @param int $size
    */
-  private function _makeSubHeapSort(int $i, int $size): void {
+  protected function _makeSubHeapSort(int $i, int $size): void {
     /** @var int $left */
     $left = (2*$i)+1;
     /** @var int $right */
