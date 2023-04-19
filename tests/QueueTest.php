@@ -5,7 +5,7 @@ namespace FOPG\Component\UtilsBundle\Tests;
 use FOPG\Component\UtilsBundle\Test\TestCase;
 use FOPG\Component\UtilsBundle\Tests\classes\FakeClass;
 use FOPG\Component\UtilsBundle\Collection\Queue;
-
+use FOPG\Component\UtilsBundle\Collection\Collection;
 
 class QueueTest extends TestCase
 {
@@ -13,7 +13,7 @@ class QueueTest extends TestCase
 
     public function testCollectionBasis(): void {
 
-      $max = 10000;
+      $max = 2000;
       $tab = [];
       for($i=1;$i<=$max;$i++)
         $tab[]=new FakeClass($i,"label $i");
@@ -40,6 +40,29 @@ class QueueTest extends TestCase
         )
         ->then(
           description: "Je retrouve mes éléments dans l'ordre de priorité",
+          callback: function(Queue $queue, int $max) {
+            $check = true;
+            $i = $max;
+            while(null !== ($obj = $queue->get())) {
+              $check = $check && ($obj->getId() === $i);
+              $i--;
+            }
+            return $check;
+          },
+          result: true
+        )
+        ->andWhen(
+          description: "J'ajoute des éléments de façon aléatoire dans la file de priorité",
+          callback: function(Queue $queue, array $tab) {
+            $collection = new Collection($tab);
+            $collection->shuffle();
+            foreach($collection as $index => $item) {
+              $queue->add($item, $index);
+            }
+          }
+        )
+        ->andThen(
+          description: "Je dois récupérer les éléments correctement trié par priorité",
           callback: function(Queue $queue, int $max) {
             $check = true;
             $i = $max;

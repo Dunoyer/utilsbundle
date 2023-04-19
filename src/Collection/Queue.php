@@ -30,14 +30,15 @@ class Queue extends Collection {
   }
 
   public function add(mixed $item, mixed $index=null, bool $includeSort = false): CollectionInterface {
-    dump('@todo');die;
     parent::add(item: $item, index: $index, includeSort: false);
-    $this->permuteLastToOneAndHeapSort();
+    parent::riseLastElementInHeapSort();
     return $this;
   }
 
   public function get(?int $index=null): mixed {
-    $index = $this->_keys[0];
+    $index = $this->_keys[0] ?? null;
+    if(null === $index)
+      return null;
     $obj = parent::get(0);
     $this->dropMaxAndHeapSort();
     return $obj;

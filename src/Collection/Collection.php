@@ -4,12 +4,13 @@ namespace FOPG\Component\UtilsBundle\Collection;
 
 use FOPG\Component\UtilsBundle\Contracts\CollectionInterface;
 
-class Collection implements CollectionInterface {
+class Collection implements CollectionInterface, \Iterator {
 
   private array $_values = [];
   protected array $_keys = [];
   private $_callback = null;
   private $_cmpAlgorithm = null;
+  private int $_current = 0;
 
   /**
    * Constructeur
@@ -36,6 +37,29 @@ class Collection implements CollectionInterface {
     }
   }
 
+  public function current(): mixed {
+    return $this->get($this->_current);
+  }
+
+  public function next(): mixed {
+    if(false === $this->valid())
+      return null;
+    $current = $this->get($this->_current);
+    $this->_current++;
+    return $current;
+  }
+
+  public function key(): mixed {
+    return $this->_current;
+  }
+
+  public function valid(): bool {
+    return ($this->_current < count($this->_keys));
+  }
+
+  public function rewind(): void {
+    $this->_current = 0;
+  }
   /**
    * Suppression d'un élément du tableau
    *
@@ -238,6 +262,28 @@ class Collection implements CollectionInterface {
     return $this;
   }
 
+  protected function riseLastElementInHeapSort(): void {
+    $last = count($this->_keys)-1;
+    $this->_makeRiseHeapSort($last);
+  }
+
+  protected function _makeRiseHeapSort(int $i): void {
+    $parent = self::parent($i);
+    if(null === $parent)
+      return;
+    /** @var Callable $cmpAlgorithm */
+    $cmpAlgorithm = $this->_cmpAlgorithm;
+    if(false === $cmpAlgorithm($this->_keys[$parent], $this->_keys[$i])) {
+      $tmp = $this->_keys[$i];
+      $this->_keys[$i] = $this->_keys[$parent];
+      $this->_keys[$parent] = $tmp;
+    }
+    $this->_makeRiseHeapSort($parent);
+  }
+
+  protected static function parent(int $i): ?int { return ($i>0) ? (int)(($i-1)/2) : null; }
+  protected static function left(int $i): int { return (2*$i)+1; }
+  protected static function right(int $i): int { return self::left($i)+1; }
   /**
    * Méthode de déplacement d'une valeur i
    *
@@ -246,9 +292,9 @@ class Collection implements CollectionInterface {
    */
   protected function _makeSubHeapSort(int $i, int $size): void {
     /** @var int $left */
-    $left = (2*$i)+1;
+    $left = self::left($i);
     /** @var int $right */
-    $right= $left+1;
+    $right= self::right($i);
     /** @var Callable $cmpAlgorithm */
     $cmpAlgorithm = $this->_cmpAlgorithm;
     $max = $i;
