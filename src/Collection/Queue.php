@@ -18,6 +18,11 @@ class Queue extends Collection {
     $this->_initHeapSort();
   }
 
+  /**
+   * Fonction de suppression de l'élément majoritaire avec remontée du prochain majoritaire
+   *
+   * @return void
+   */
   private function dropMaxAndHeapSort(): void {
     $len = count($this->_keys);
     $size = $len-1;
@@ -29,12 +34,27 @@ class Queue extends Collection {
 
   }
 
+  /**
+   * Ajout d'un élément dans la file de priorité
+   *
+   * @param mixed $item
+   * @param mixed $index
+   * @param bool $includeSort
+   * @return CollectionInterface
+   */
   public function add(mixed $item, mixed $index=null, bool $includeSort = false): CollectionInterface {
     parent::add(item: $item, index: $index, includeSort: false);
     parent::riseLastElementInHeapSort();
     return $this;
   }
 
+  /**
+   * Récupération du premier élément dans la file de priorité
+   *
+   * La récupération entraîne la sortie de cet élément de la file de priorité
+   * @param ?int $index ignoré (présent pour la compatibilité avec la classe parente)
+   * @return mixed
+   */
   public function get(?int $index=null): mixed {
     $index = $this->_keys[0] ?? null;
     if(null === $index)
