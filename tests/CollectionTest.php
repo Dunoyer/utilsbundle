@@ -11,6 +11,34 @@ class CollectionTest extends TestCase
 {
     const SECTION_HEADER = '[Collection]';
 
+    public function testQuickSort(): void {
+      $correctTab=[];
+      for($i=10000;$i>0;$i--)
+        $correctTab[$i]=$i;
+
+      $this
+        ->given(
+          description: self::SECTION_HEADER." Contrôle du bon fonctionnement du tri rapide",
+          tab: $correctTab
+        )
+        ->when(
+          description: "J'effectue un tri avec l'algorithme du tri rapide",
+          callback: function(array $tab, ?Collection &$collection=null) {
+            $collection = new Collection($tab);
+            $collection->shuffle();
+            $collection->quickSort();
+          }
+        )
+        ->then(
+          description: "La collection est bien triée",
+          callback: function(Collection $collection): string {
+            return (string)$collection;
+          },
+          result: "<".implode(",",$correctTab).">"
+        )
+      ;
+    }
+
     public function testCollectionBasis(): void {
 
       $max = 10000;

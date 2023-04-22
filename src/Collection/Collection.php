@@ -223,6 +223,50 @@ class Collection implements CollectionInterface, \Iterator {
   }
 
   /**
+   * Triage par tri rapide
+   *
+   * @complexity O(n lg n)
+   */
+  public function quickSort(): self {
+    $first = 0;
+    $last = count($this->_keys)-1;
+    $this->_makeSubQuickSort($first, $last);
+    return $this;
+  }
+
+  private function _makeSubQuickSort(int $p, int $q): void {
+    if($p>$q)
+      return;
+    $r = $this->_findSeparatorOfQuickSort($p,$q);
+    $this->_makeSubQuickSort($p,$r-1);
+    $this->_makeSubQuickSort($r+1,$q);
+  }
+
+  private function _findSeparatorOfQuickSort(int $p, int $q): int {
+    /** optimisation pour garantir un tableau équilibré */
+    $rand = rand($p,$q);
+    $tmp = $this->_keys[$q];
+    $this->_keys[$q]=$this->_keys[$rand];
+    $this->_keys[$rand]=$tmp;
+
+    /** séparation des min/max */
+    $max = $this->_keys[$q];
+    $cmpAlgorithm = $this->_cmpAlgorithm;
+    $i = $p-1;
+    for($j=$p;$j<$q;$j++) {
+      $valJ = $this->_keys[$j];
+      if(true === $cmpAlgorithm($valJ,$max)) {
+        $i++;
+        $this->_keys[$j] = $this->_keys[$i];
+        $this->_keys[$i] = $valJ;
+      }
+    }
+    $this->_keys[$q]=$this->_keys[$i+1];
+    $this->_keys[$i+1]=$max;
+    return $i+1;
+  }
+
+  /**
    * Processus d'initialisation du tri par tas
    *
    * @return self
