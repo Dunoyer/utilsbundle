@@ -3,6 +3,7 @@
 namespace FOPG\Component\UtilsBundle\Collection;
 
 use FOPG\Component\UtilsBundle\Contracts\CollectionInterface;
+use FOPG\Component\UtilsBundle\Exception\InvalidArgumentException;
 
 class Collection implements CollectionInterface, \Iterator {
 
@@ -211,7 +212,8 @@ class Collection implements CollectionInterface, \Iterator {
   /**
    * Triage par fusion
    *
-   * Compléxité : O(n lg n)
+   * Compléxité en temps : O(n lg n)
+   * Compléxité en espace: O(1)
    *
    * @return self
    */
@@ -219,6 +221,126 @@ class Collection implements CollectionInterface, \Iterator {
     $first = 0;
     $last = count($this->_keys)-1;
     $this->_makeSubMergeSort($first, $last);
+    return $this;
+  }
+
+  /**
+   * Validation que l'ensemble des clés en tant qu'entier strict
+   *
+   * Compléxité en temps : O(n)
+   *
+   * @throw InvalidArgumentException
+   */
+  private function _assertIntOnlyInKeys(): void {
+    foreach($this->_keys as $key)
+      if(!is_int($key))
+        throw new InvalidArgumentException('key '.$key.' is forbidden (only int accepted)');
+  }
+
+  /**
+   * Tri par dénombrement
+   *
+   * Les valeurs triés doivent être des entiers
+   *
+   * Compléxité en temps : O(n)
+   * Compléxité en espace: O(n)
+   *
+   * @return self
+   */
+  public function countingSort(): self {
+    $this->_assertIntOnlyInKeys();
+    /** @var int $ln */
+    $ln = count($this->_keys);
+    /** @var ?int $min */
+    $min = null;
+    /** @var ?int $max */
+    $max = null;
+    $this->findMinMax(min: $min, max: $max);
+    /** @var array $b */
+    $b = [];
+    for($i=$min; $i<=$max;$i++)
+      $b[$i]=0;
+
+    for($i=0;$i<$ln;$i++)
+      $b[$this->_keys[$i]]++;
+
+    for($i=$min+1;$i<=$max;$i++)
+      $b[$i]+=$b[$i-1];
+    /** @var array<int,int> $c */
+    $c=[];
+    for($i=$ln-1;$i>=0;$i--) {
+      $key = $this->_keys[$i];
+      $val = $b[$key];
+      $c[$val-1]=$key;
+      $b[$key]--;
+    }
+
+    for($i=0;$i<$ln;$i++)
+      $this->_keys[$i] = $c[$i];
+
+    return $this;
+  }
+
+  /**
+   * Tri de sélection des extrêmums
+   *
+   * La notion de minimum et maximum est fonction de la méthode de comparaison.
+   * Il peut ainsi survenir de façon contre intuitive qu'un maximum puisse être inférieur au
+   * maximum au sens logique
+   *
+   * @param $min Valeur minimale trouvée
+   * @param $max Valeur maximale trouvée
+   * @return self
+   */
+  public function findMinMax(mixed &$min, mixed &$max): self {
+    /** @var int $mid */
+    $mid = (int)(count($this->_keys)/2);
+    /** @var bool $isEven */
+    $isEven = (count($this->_keys)%2 === 0);
+    /** @var mixed $min */
+    $min = $this->_keys[0];
+    /** @var Callable $cmpAlgorithm */
+    $cmpAlgorithm = $this->_cmpAlgorithm;
+    /** @var mixed $max */
+    $max = $min;
+    /** @var int $inc */
+    $inc = -1;
+    if(true === $isEven) {
+      $inc = 0;
+      $max = $this->_keys[1];
+      if(true === $cmpAlgorithm($min,$max)) {
+        $tmp = $min;
+        $min = $max;
+        $max = $tmp;
+      }
+    }
+    else {
+      $mid+=1;
+    }
+
+    for($i=2;$i<=$mid;$i++) {
+      $indexA=2*($i-1);
+      $indexA+=$inc;
+      $indexB=$indexA+1;
+      $lmin = $this->_keys[$indexA];
+      $lmax = $this->_keys[$indexB];
+
+      if(true === $cmpAlgorithm($lmin, $lmax)) {
+        $tmp = $lmin;
+        $lmin = $lmax;
+        $lmax = $tmp;
+      }
+      if(true === $cmpAlgorithm($min, $lmin)) {
+        $tmp = $lmin;
+        $min = $lmin;
+        $lmin = $tmp;
+      }
+      if(true === $cmpAlgorithm($lmax, $max)) {
+        $tmp = $lmax;
+        $max = $lmax;
+        $lmax = $tmp;
+      }
+    }
     return $this;
   }
 

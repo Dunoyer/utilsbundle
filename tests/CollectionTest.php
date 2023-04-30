@@ -11,6 +11,110 @@ class CollectionTest extends TestCase
 {
     const SECTION_HEADER = '[Collection]';
 
+    public function testCountingSort(): void {
+      /** @var array $tab */
+      $tab=[2,1,2,3,10,5,1,7,1,2,3,4,9];
+      /** @var array $correctTab */
+      $correctTab=[1,1,1,2,2,2,3,3,4,5,7,9,10];
+
+      $this
+        ->given(
+          description: self::SECTION_HEADER." Contrôle du tri par dénombrement",
+          tab: $tab
+        )
+        ->when(
+          description: "J'appelle la fonction de tri de mon tableau d'entier",
+          callback: function(array $tab, Collection &$collection=null) {
+            $collection = new Collection(
+              $tab,
+              function(int $index, mixed $item): mixed { return $item; },
+              /** Fonction de comparaison pour le tri */
+              function(int $keyA, int $keyB): bool { return ($keyA>$keyB); }
+            );
+            $collection->countingSort();
+          }
+        )
+        ->then(
+          description: "Le tableau doit être correctement trié",
+          callback: function(Collection $collection) {
+            return (string)$collection;
+          },
+          result: '<'.implode(',',$correctTab).'>'
+        )
+      ;
+    }
+
+    public function testMinMax(): void {
+      $correctEven=[];
+      for($i=1;$i<=1000;$i++)
+        $correctEven[]=($i%2) ? (2*$i+1) : (3*$i-1);
+      $maxEven = $correctEven[0];
+      $minEven = $correctEven[0];
+      foreach($correctEven as $value) {
+        if($maxEven < $value)
+          $maxEven = $value;
+        if($minEven > $value)
+          $minEven = $value;
+      }
+      $i = count($correctEven);
+      $minOdd = $minEven;
+      $maxOdd = 4*$i;
+      $correctOdd=$correctEven;
+      $correctOdd[]=$maxOdd;
+
+      $this
+        ->given(
+          description: self::SECTION_HEADER." Contrôle du bon fonctionnement du minmax",
+          tabEven: $correctEven,
+          tabOdd: $correctOdd
+        )
+        ->when(
+          description: "Je recherche les valeurs minimale et maximale du tableau à nombre de clé pair",
+          callback: function(
+            array $tabEven,
+            array $tabOdd,
+            ?int &$lminEven=null,
+            ?int &$lminOdd=null,
+            ?int &$lmaxEven=null,
+            ?int &$lmaxOdd=null
+          ) {
+            $collection = new Collection(
+              $tabEven, /** Fonction d'identification de la valeur de tri */
+              function(int $index, int $item): int { return $item; },
+              /** Fonction de comparaison pour le tri */
+              function(int $keyA, int $keyB): bool { return ($keyA>$keyB); }
+            );
+            $collection->shuffle();
+            $collection->findMinMax(min: $lminEven,max: $lmaxEven);
+
+            $collection = new Collection(
+              $tabOdd, /** Fonction d'identification de la valeur de tri */
+              function(int $index, int $item): int { return $item; },
+              /** Fonction de comparaison pour le tri */
+              function(int $keyA, int $keyB): bool { return ($keyA>$keyB); }
+            );
+            $collection->shuffle();
+            $collection->findMinMax(min: $lminOdd,max: $lmaxOdd);
+          }
+        )
+        ->then(
+          description: "Les extrêmums du tableau à nombre de clé pair doivent bien être retrouvés",
+          callback: function(int $lminEven, int $lmaxEven) {
+            return [$lminEven, $lmaxEven];
+          },
+          result: [$minEven, $maxEven]
+        )
+        ->andThen(
+          description: "Les extrêmums du tableau à nombre de clé impair doivent bien être retrouvés",
+          callback: function(int $lminOdd, int $lmaxOdd) {
+            return [$lminOdd, $lmaxOdd];
+          },
+          result: [$minOdd, $maxOdd]
+        )
+      ;
+
+    }
+
     public function testQuickSort(): void {
       $correctTab=[];
       for($i=10000;$i>0;$i--)
