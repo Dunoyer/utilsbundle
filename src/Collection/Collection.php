@@ -255,7 +255,14 @@ class Collection implements CollectionInterface, \Iterator {
     $min = null;
     /** @var ?int $max */
     $max = null;
+    $isReverse = false;
     $this->findMinMax(min: $min, max: $max);
+    if($min>$max) {
+      $isReverse = true;
+      $tmp = $min;
+      $min = $max;
+      $max = $tmp;
+    }
     /** @var array $b */
     $b = [];
     for($i=$min; $i<=$max;$i++)
@@ -275,8 +282,10 @@ class Collection implements CollectionInterface, \Iterator {
       $b[$key]--;
     }
 
-    for($i=0;$i<$ln;$i++)
-      $this->_keys[$i] = $c[$i];
+    for($i=0;$i<$ln;$i++) {
+      $j = (false === $isReverse) ? $i : ($ln - $i -1);
+      $this->_keys[$j] = $c[$i];
+    }
 
     return $this;
   }
