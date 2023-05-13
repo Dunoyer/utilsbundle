@@ -7,8 +7,11 @@ use FOPG\Component\UtilsBundle\Exception\InvalidArgumentException;
 
 class Collection implements CollectionInterface, \Iterator {
 
+  use CollectionKeyManagerTrait;
+
   private array $_values = [];
-  protected array $_keys = [];
+  protected array $_newValues = [];
+
   private $_callback = null;
   private $_cmpAlgorithm = null;
   private int $_current = 0;
@@ -33,8 +36,9 @@ class Collection implements CollectionInterface, \Iterator {
     foreach($array as $index => $item) {
       /** @var mixed $realIndex */
       $realIndex = $callback($index, $item);
+      $uniqid = $this->append_key($realIndex);
       $this->_values[$realIndex] = $item;
-      $this->_keys[]=$realIndex;
+      $this->_newValues[$uniqid]=$item;
     }
   }
 
@@ -55,7 +59,7 @@ class Collection implements CollectionInterface, \Iterator {
   }
 
   public function valid(): bool {
-    return ($this->_current < count($this->_keys));
+    return ($this->_current < $this->count());
   }
 
   public function rewind(): void {
@@ -68,20 +72,7 @@ class Collection implements CollectionInterface, \Iterator {
    * @return bool
    */
   public function remove(mixed $index): bool {
-    /** @var int|false $keyIndex */
-    $keyIndex = array_search($index, $this->_keys);
-    if(false === $keyIndex)
-      return false;
-    /** @var int $size */
-    $size = count($this->_keys);
-    /** @var mixed $tmp */
-    $tmp = $this->_keys[$keyIndex];
-    unset($this->_values[$tmp]);
-    /** @var int $i */
-    for($i = $keyIndex; $i<$size;$i++)
-      $this->_keys[$i]=$this->_keys[$i+1];
-    unset($this->_keys[$size-1]);
-    return true;
+    return $this->remove_key($index);
   }
 
   /**
@@ -96,9 +87,11 @@ class Collection implements CollectionInterface, \Iterator {
     $callback = $this->_callback;
     $realIndex = $callback($index, $item);
     $this->_values[$realIndex] = $item;
-    $this->_keys[count($this->_keys)]=$realIndex;
+    $uniqid=$this->append_key($realIndex);
+    $this->_values[$realIndex] = $item;
+    $this->_newValues[$uniqid] = $item;
     if(true === $includeSort) {
-      $last = count($this->_keys)-1;
+      $last = $this->count()-1;
       $this->insertionSort($last);
     }
     return $this;
@@ -109,7 +102,7 @@ class Collection implements CollectionInterface, \Iterator {
   }
 
   public function getKeys(): array {
-    return $this->_keys;
+    return $this->get_keys();
   }
 
   /**
@@ -142,15 +135,35 @@ class Collection implements CollectionInterface, \Iterator {
    */
   public function insertLastToLeft(mixed $keyOrigin, mixed $keyTarget): bool {
     /** @var int|bool $origin */
-    $origin = array_search($keyOrigin, $this->_keys);
+    $origin = $this->search_in_keys($keyOrigin);
+
     /** @var int|bool $target */
-    $target = array_search($keyTarget, $this->_keys);
+    $target = $this->search_in_keys($keyTarget);
+    /** @var ?CollectionKey $memTarget */
+    $memTarget = $this->_newKeys[$target];
+
     if(false !== $origin && false !== $target) {
       for($i=$target-1;$i>=$origin;$i--)
         $this->_keys[$i+1] = $this->_keys[$i];
       $this->_keys[$origin]=$keyTarget;
+      for($i=$target-1;$i>=$origin;$i--)
+        $this->_newKeys[$i+1] = $this->_newKeys[$i];
+      $this->_newKeys[$origin]=$memTarget;
       return true;
     }
+    return false;
+  }
+
+  /**
+   * Récupération de l'index pour une clé donnée
+   *
+   * @param mixed $key
+   * @return int|bool
+   */
+  private function search_in_keys(mixed $key): mixed {
+    foreach($this->_newKeys as $index => $cKey)
+      if($key === $cKey->getKey())
+        return $index;
     return false;
   }
 
@@ -161,12 +174,15 @@ class Collection implements CollectionInterface, \Iterator {
    */
   public function permute(mixed $keyOrigin, mixed $keyTarget): bool {
     /** @var int|bool $origin */
-    $origin = array_search($keyOrigin, $this->_keys);
+    $origin = $this->search_in_keys($keyOrigin);
     /** @var int|bool $target */
-    $target = array_search($keyTarget, $this->_keys);
+    $target = $this->search_in_keys($keyTarget);
     if(false !== $origin && false !== $target) {
+      $tmp = $this->_newKeys[$target];
       $this->_keys[$origin] = $keyTarget;
+      $this->_newKeys[$target] = $this->_newKeys[$origin];
       $this->_keys[$target] = $keyOrigin;
+      $this->_newKeys[$origin] = $tmp;
       return true;
     }
     return false;
@@ -177,12 +193,10 @@ class Collection implements CollectionInterface, \Iterator {
    *
    */
   public function shuffle(): self {
-    $last = count($this->_keys)-1;
+    $last = $this->count()-1;
     for($i=0;$i<=$last;$i++) {
       $rand = rand($i,$last);
-      $tmp = $this->_keys[$i];
-      $this->_keys[$i] = $this->_keys[$rand];
-      $this->_keys[$rand] = $tmp;
+      $this->permute_keys($i,$rand);
     }
     return $this;
   }
@@ -206,7 +220,7 @@ class Collection implements CollectionInterface, \Iterator {
    * @return int
    */
   public function count(): int {
-    return count($this->_keys);
+    return $this->count_keys();
   }
 
   /**
@@ -219,7 +233,7 @@ class Collection implements CollectionInterface, \Iterator {
    */
   public function mergeSort(): self {
     $first = 0;
-    $last = count($this->_keys)-1;
+    $last = $this->count()-1;
     $this->_makeSubMergeSort($first, $last);
     return $this;
   }
@@ -232,9 +246,9 @@ class Collection implements CollectionInterface, \Iterator {
    * @throw InvalidArgumentException
    */
   private function _assertIntOnlyInKeys(): void {
-    foreach($this->_keys as $key)
-      if(!is_int($key))
-        throw new InvalidArgumentException('key '.$key.' is forbidden (only int accepted)');
+    foreach($this->_newKeys as $ckey)
+      if(!is_int($ckey->getKey()))
+        throw new InvalidArgumentException('key '.$ckey->getKey().' is forbidden (only int accepted)');
   }
 
   /**
@@ -250,7 +264,7 @@ class Collection implements CollectionInterface, \Iterator {
   public function countingSort(): self {
     $this->_assertIntOnlyInKeys();
     /** @var int $ln */
-    $ln = count($this->_keys);
+    $ln = $this->count();
     /** @var ?int $min */
     $min = null;
     /** @var ?int $max */
@@ -269,14 +283,14 @@ class Collection implements CollectionInterface, \Iterator {
       $b[$i]=0;
 
     for($i=0;$i<$ln;$i++)
-      $b[$this->_keys[$i]]++;
+      $b[$this->get_key_by_index($i)]++;
 
     for($i=$min+1;$i<=$max;$i++)
       $b[$i]+=$b[$i-1];
     /** @var array<int,int> $c */
     $c=[];
     for($i=$ln-1;$i>=0;$i--) {
-      $key = $this->_keys[$i];
+      $key = $this->get_key_by_index($i);
       $val = $b[$key];
       $c[$val-1]=$key;
       $b[$key]--;
@@ -303,11 +317,11 @@ class Collection implements CollectionInterface, \Iterator {
    */
   public function findMinMax(mixed &$min, mixed &$max): self {
     /** @var int $mid */
-    $mid = (int)(count($this->_keys)/2);
+    $mid = (int)($this->count()/2);
     /** @var bool $isEven */
-    $isEven = (count($this->_keys)%2 === 0);
+    $isEven = ($this->count()%2 === 0);
     /** @var mixed $min */
-    $min = $this->_keys[0];
+    $min = $this->_newKeys[0]->getKey();
     /** @var Callable $cmpAlgorithm */
     $cmpAlgorithm = $this->_cmpAlgorithm;
     /** @var mixed $max */
@@ -316,7 +330,7 @@ class Collection implements CollectionInterface, \Iterator {
     $inc = -1;
     if(true === $isEven) {
       $inc = 0;
-      $max = $this->_keys[1];
+      $max = $this->_newKeys[1]->getKey();
       if(true === $cmpAlgorithm($min,$max)) {
         $tmp = $min;
         $min = $max;
@@ -331,8 +345,8 @@ class Collection implements CollectionInterface, \Iterator {
       $indexA=2*($i-1);
       $indexA+=$inc;
       $indexB=$indexA+1;
-      $lmin = $this->_keys[$indexA];
-      $lmax = $this->_keys[$indexB];
+      $lmin = $this->_newKeys[$indexA]->getKey();
+      $lmax = $this->_newKeys[$indexB]->getKey();
 
       if(true === $cmpAlgorithm($lmin, $lmax)) {
         $tmp = $lmin;
@@ -360,7 +374,7 @@ class Collection implements CollectionInterface, \Iterator {
    */
   public function quickSort(): self {
     $first = 0;
-    $last = count($this->_keys)-1;
+    $last = $this->count()-1;
     $this->_makeSubQuickSort($first, $last);
     return $this;
   }
@@ -376,24 +390,26 @@ class Collection implements CollectionInterface, \Iterator {
   private function _findSeparatorOfQuickSort(int $p, int $q): int {
     /** optimisation pour garantir un tableau équilibré */
     $rand = rand($p,$q);
-    $tmp = $this->_keys[$q];
-    $this->_keys[$q]=$this->_keys[$rand];
-    $this->_keys[$rand]=$tmp;
+
+    $this->permute_keys($q, $rand);
 
     /** séparation des min/max */
-    $max = $this->_keys[$q];
+    /** @var mixed $max */
+    $max = $this->get_key_by_index($q);
+    /** @var CollectionKey $obj */
+    $obj = $this->get_key($q);
     $cmpAlgorithm = $this->_cmpAlgorithm;
     $i = $p-1;
     for($j=$p;$j<$q;$j++) {
-      $valJ = $this->_keys[$j];
+      $valJ = $this->get_key_by_index($j);
       if(true === $cmpAlgorithm($valJ,$max)) {
         $i++;
-        $this->_keys[$j] = $this->_keys[$i];
-        $this->_keys[$i] = $valJ;
+        $this->permute_keys($j,$i);
       }
     }
-    $this->_keys[$q]=$this->_keys[$i+1];
-    $this->_keys[$i+1]=$max;
+    $obj2 = $this->get_key($i+1);
+    $this->set_key($q, $obj2);
+    $this->set_key($i+1, $obj);
     return $i+1;
   }
 
@@ -403,7 +419,7 @@ class Collection implements CollectionInterface, \Iterator {
    * @return self
    */
   protected function _initHeapSort(): self {
-    $len = count($this->_keys);
+    $len = $this->count();
     $size = $len-1;
 
     for($i=(int)($size/2);$i>=0;$i--) {
@@ -421,24 +437,23 @@ class Collection implements CollectionInterface, \Iterator {
    * Compléxité : O(n lg n)
    */
   public function heapSort(): self {
-    $len = count($this->_keys);
+    $len = $this->count();
     $size = $len-1;
 
     $this->_initHeapSort();
 
     for($i=$size;$i>0;$i--) {
-      $tmp = $this->_keys[$i];
-      $this->_keys[$i] = $this->_keys[0];
-      $this->_keys[0] = $tmp;
+      $this->permute_keys($i,0);
       $this->_makeSubHeapSort(0, $i-1);
     }
-    $this->_keys = array_reverse($this->_keys);
+
+    $this->reverse_keys();
 
     return $this;
   }
 
   protected function riseLastElementInHeapSort(): void {
-    $last = count($this->_keys)-1;
+    $last = $this->count()-1;
     $this->_makeRiseHeapSort($last);
   }
 
@@ -448,11 +463,13 @@ class Collection implements CollectionInterface, \Iterator {
       return;
     /** @var Callable $cmpAlgorithm */
     $cmpAlgorithm = $this->_cmpAlgorithm;
-    if(false === $cmpAlgorithm($this->_keys[$parent], $this->_keys[$i])) {
-      $tmp = $this->_keys[$i];
-      $this->_keys[$i] = $this->_keys[$parent];
-      $this->_keys[$parent] = $tmp;
-    }
+    /** @var mixed $keyParent */
+    $keyParent = $this->get_key_by_index($parent);
+    /** @var mixed $keyI */
+    $keyI = $this->get_key_by_index($i);
+    if(false === $cmpAlgorithm($keyParent, $keyI))
+      $this->permute_keys($i, $parent);
+
     $this->_makeRiseHeapSort($parent);
   }
 
@@ -480,10 +497,7 @@ class Collection implements CollectionInterface, \Iterator {
     if(($right <= $size) && (true === $cmpAlgorithm($this->_keys[$right], $this->_keys[$max])))
       $max = $right;
     if($max !== $i) {
-      $tmp = $this->_keys[$max];
-      $this->_keys[$max] = $this->_keys[$i];
-      $this->_keys[$i] = $tmp;
-
+      $this->permute_keys($max, $i);
       $this->_makeSubHeapSort($max, $size);
     }
   }
@@ -496,17 +510,17 @@ class Collection implements CollectionInterface, \Iterator {
    * @param int $first
    */
   public function insertionSort(int $first=1): self {
-    $last = count($this->_keys);
+    $last = $this->count();
     $cmpAlgorithm = $this->_cmpAlgorithm;
 
     for($i=$first;$i<$last;$i++) {
-      $current = $this->_keys[$i];
+      $current2 = $this->_newKeys[$i];
       $j=$i;
-      while($j>0 && (false === $cmpAlgorithm($this->_keys[$j-1], $current))) {
-        $this->_keys[$j] = $this->_keys[$j-1];
+      while($j>0 && (false === $cmpAlgorithm($this->get_key_by_index($j-1), $current2->getKey()))) {
+        $tmp = $this->set_key($j, $this->get_key($j-1));
         $j--;
       }
-      $this->_keys[$j]=$current;
+      $this->set_key($j, $current2);
     }
 
     return $this;
