@@ -7,10 +7,7 @@ use FOPG\Component\UtilsBundle\Exception\InvalidArgumentException;
 
 class Collection implements CollectionInterface, \Iterator {
 
-  use CollectionKeyManagerTrait;
-
-  private array $_values = [];
-  protected array $_newValues = [];
+  use CollectionKeyValueManagerTrait;
 
   private $_callback = null;
   private $_cmpAlgorithm = null;
@@ -23,7 +20,12 @@ class Collection implements CollectionInterface, \Iterator {
    * @param ?Callable $callback Fonction d'extraction de l'index
    * @param ?Callable $cmpAlgorithm Méthode de comparaison sur les index
    */
-  public function __construct(array $array=[], ?Callable $callback=null, ?Callable $cmpAlgorithm=null) {
+  public function __construct(
+    array $array=[],
+    ?Callable $callback=null,
+    ?Callable $cmpAlgorithm=null,
+    ?Callable $callbackForValue=null
+  ) {
 
     if(null === $callback)
       $callback = function($index, $item) { return $index; };
@@ -33,12 +35,14 @@ class Collection implements CollectionInterface, \Iterator {
       $cmpAlgorithm = function($a,$b): bool { return ($a > $b); };
     $this->_cmpAlgorithm = $cmpAlgorithm;
 
+    if(null === $callbackForValue)
+      $callbackForValue = function($index, $item) { return $item; };
+
     foreach($array as $index => $item) {
       /** @var mixed $realIndex */
       $realIndex = $callback($index, $item);
-      $uniqid = $this->append_key($realIndex);
-      $this->_values[$realIndex] = $item;
-      $this->_newValues[$uniqid]=$item;
+      $value = $callbackForValue($index, $item);
+      $this->append($realIndex, $value);
     }
   }
 
@@ -86,10 +90,7 @@ class Collection implements CollectionInterface, \Iterator {
   public function add(mixed $item, mixed $index=null, bool $includeSort = false): CollectionInterface {
     $callback = $this->_callback;
     $realIndex = $callback($index, $item);
-    $this->_values[$realIndex] = $item;
-    $uniqid=$this->append_key($realIndex);
-    $this->_values[$realIndex] = $item;
-    $this->_newValues[$uniqid] = $item;
+    $this->append($realIndex, $item);
     if(true === $includeSort) {
       $last = $this->count()-1;
       $this->insertionSort($last);
@@ -120,7 +121,7 @@ class Collection implements CollectionInterface, \Iterator {
 
   public function __toString(): string {
     /** @var string $keys */
-    $keys = implode(",",$this->_keys);
+    $keys = implode(",",$this->get_keys());
     return "<".$keys.">";
   }
 
@@ -140,15 +141,13 @@ class Collection implements CollectionInterface, \Iterator {
     /** @var int|bool $target */
     $target = $this->search_in_keys($keyTarget);
     /** @var ?CollectionKey $memTarget */
-    $memTarget = $this->_newKeys[$target];
-
+    $memTarget = $this->get_key($target);
     if(false !== $origin && false !== $target) {
-      for($i=$target-1;$i>=$origin;$i--)
-        $this->_keys[$i+1] = $this->_keys[$i];
-      $this->_keys[$origin]=$keyTarget;
-      for($i=$target-1;$i>=$origin;$i--)
-        $this->_newKeys[$i+1] = $this->_newKeys[$i];
-      $this->_newKeys[$origin]=$memTarget;
+      for($i=$target-1;$i>=$origin;$i--) {
+        $tmp = $this->get_key($i);
+        $this->set_key($i+1, $tmp);
+      }
+      $this->set_key($origin, $memTarget);
       return true;
     }
     return false;
@@ -178,11 +177,7 @@ class Collection implements CollectionInterface, \Iterator {
     /** @var int|bool $target */
     $target = $this->search_in_keys($keyTarget);
     if(false !== $origin && false !== $target) {
-      $tmp = $this->_newKeys[$target];
-      $this->_keys[$origin] = $keyTarget;
-      $this->_newKeys[$target] = $this->_newKeys[$origin];
-      $this->_keys[$target] = $keyOrigin;
-      $this->_newKeys[$origin] = $tmp;
+      $this->permute_keys($origin, $target);
       return true;
     }
     return false;
@@ -209,9 +204,7 @@ class Collection implements CollectionInterface, \Iterator {
    * @return mixed
    */
   public function get(int $index=null): mixed {
-    /** @var mixed $realIndex */
-    $realIndex = $this->_keys[$index] ?? null;
-    return (null !== $realIndex) ? $this->_values[$realIndex] : null;
+    return $this->get_value_by_index($index);
   }
 
   /**
@@ -292,13 +285,13 @@ class Collection implements CollectionInterface, \Iterator {
     for($i=$ln-1;$i>=0;$i--) {
       $key = $this->get_key_by_index($i);
       $val = $b[$key];
-      $c[$val-1]=$key;
+      $c[$val-1]=$this->get_key($i);
       $b[$key]--;
     }
 
     for($i=0;$i<$ln;$i++) {
       $j = (false === $isReverse) ? $i : ($ln - $i -1);
-      $this->_keys[$j] = $c[$i];
+      $this->set_key($j, $c[$i]);
     }
 
     return $this;
@@ -491,10 +484,10 @@ class Collection implements CollectionInterface, \Iterator {
     $cmpAlgorithm = $this->_cmpAlgorithm;
     $max = $i;
 
-    if(($left <= $size) && (true === $cmpAlgorithm($this->_keys[$left], $this->_keys[$max])))
+    if(($left <= $size) && (true === $cmpAlgorithm($this->get_key_by_index($left), $this->get_key_by_index($max))))
       $max = $left;
 
-    if(($right <= $size) && (true === $cmpAlgorithm($this->_keys[$right], $this->_keys[$max])))
+    if(($right <= $size) && (true === $cmpAlgorithm($this->get_key_by_index($right), $this->get_key_by_index($max))))
       $max = $right;
     if($max !== $i) {
       $this->permute_keys($max, $i);
@@ -540,25 +533,24 @@ class Collection implements CollectionInterface, \Iterator {
 
     $left = [];
     for($w=$i;$w<=$h;$w++)
-      $left[]=$this->_keys[$w];
+      $left[]=$this->get_key($w);
 
     $right = [];
     for($w=$h+1;$w<=$j;$w++)
-      $right[]=$this->_keys[$w];
+      $right[]=$this->get_key($w);
 
     $current = $i;
     $w=0;
     $z=0;
 
     do {
-      /** @var ?int $indL */
+      /** @var ?CollectionKey $indL */
       $indL = $left[$w] ?? null;
-      /** @var ?int $indR */
+      /** @var ?CollectionKey $indR */
       $indR = $right[$z] ?? null;
-
       if(null === $indL) {
         do {
-          $this->_keys[$current]=$indR;
+          $this->set_key($current, $indR);
           $z++;
           $current++;
         }
@@ -567,7 +559,7 @@ class Collection implements CollectionInterface, \Iterator {
       }
       if(null === $indR) {
         do {
-          $this->_keys[$current]=$indL;
+          $this->set_key($current, $indL);
           $w++;
           $current++;
         }
@@ -575,12 +567,12 @@ class Collection implements CollectionInterface, \Iterator {
         return;
       }
 
-      if(true === $cmpAlgorithm($indL, $indR)) {
-        $this->_keys[$current]=$indL;
+      if(true === $cmpAlgorithm($indL->getKey(), $indR->getKey())) {
+        $this->set_key($current, $indL);
         $w++;
       }
       else {
-        $this->_keys[$current]=$indR;
+        $this->set_key($current, $indR);
         $z++;
       }
       $current++;

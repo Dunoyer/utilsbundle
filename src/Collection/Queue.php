@@ -24,12 +24,10 @@ class Queue extends Collection {
    * @return void
    */
   private function dropMaxAndHeapSort(): void {
-    $len = count($this->_keys);
+    $len = $this->count();
     $size = $len-1;
-    $tmp = $this->_keys[$size];
-    $this->_keys[$size] = $this->_keys[0];
-    $this->_keys[0] = $tmp;
-    $this->remove($this->_keys[$size]);
+    $this->permute_keys(0,$size);
+    $this->remove_key_by_index($size);
     $this->_makeSubHeapSort(0, $size-1);
 
   }
@@ -56,7 +54,7 @@ class Queue extends Collection {
    * @return mixed
    */
   public function get(?int $index=null): mixed {
-    $index = $this->_keys[0] ?? null;
+    $index = $this->get_key(0) ?? null;
     if(null === $index)
       return null;
     $obj = parent::get(0);

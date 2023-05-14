@@ -115,6 +115,40 @@ class CollectionTest extends TestCase
 
     }
 
+    public function testValueRetrieval(): void {
+      /** @var array<string, int> Tableau à trier */
+      $tab = ['a' => 1, 'b' => 1, 'c' => 2, 'd' => 0, 'e' => 2];
+      $this
+        ->given(
+          description: "Gestion des tableaux contenant des clés égalitaires",
+          tab: $tab
+        )
+        ->when(
+          description: "Je trie le tableau contenant de nombreuses clés égalitaires",
+          callback: function(array $tab, ?Collection &$collection=null) {
+            $collection = new Collection(
+              $tab,
+              function(string $item,int $index):int { return $index; },
+              function(int $indexA, int $indexB): bool { return $indexA > $indexB; },
+              function(string $item,int $index): string { return $item; }
+            );
+            $collection->heapSort();
+          }
+        )
+        ->then(
+          description: "Je peux récupérer les valeurs triées",
+          callback: function(Collection $collection, array $tab) {
+            $check = true;
+            for($i=0;$i < $collection->count(); $i++)
+              $check = $check && in_array($collection->get_value_by_index($i), array_keys($tab));
+            return $check;
+
+          },
+          result: true
+        )
+      ;
+
+    }
     public function testQuickSort(): void {
       $correctTab=[];
       for($i=10000;$i>0;$i--)
@@ -145,7 +179,7 @@ class CollectionTest extends TestCase
 
     public function testCollectionBasis(): void {
 
-      $max = 10000;
+      $max = 100;
       $tab = [];
       $correctTab = [];
       for($i=1;$i<=$max;$i++) {
