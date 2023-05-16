@@ -50,6 +50,7 @@ class Collection implements CollectionInterface, \Iterator {
     return $this->get($this->_current);
   }
 
+  #[\ReturnTypeWillChange]
   public function next(): mixed {
     if(false === $this->valid())
       return null;
