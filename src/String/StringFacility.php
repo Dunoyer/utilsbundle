@@ -26,8 +26,12 @@ class StringFacility
   }
 
   public static function toDate(string $model): ?\DateTime {
-    if(preg_match("/^(?<year>\d{4})\/(?<month>\d{2})\/(?<day>\d{2})$/", trim($model), $matches))
-      return new \DateTime(str_replace('/','-',$model));
+    if(
+      preg_match("/^(?<year>\d{4})[\/-](?<month>\d{2})[\/-](?<day>\d{2})$/", trim($model), $matches)
+      ||
+      preg_match("/^(?<day>\d{2})\/(?<month>\d{2})\/(?<year>\d{4})$/", trim($model), $matches)
+    )
+      return new \DateTime($matches['year'].'-'.$matches['month'].'-'.$matches['day']);
     return null;
   }
 
