@@ -71,9 +71,6 @@
         "symfony/symfony": "*"
     },
     "extra": {
-        "branch-alias": {
-            "dev-main": "1.0.5"
-        },
         "symfony": {
             "allow-contrib": false,
             "require": "5.4.*"
