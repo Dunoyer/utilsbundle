@@ -41,6 +41,9 @@
             "symfony/flex": true,
             "symfony/runtime": true
         },
+        "preferred-install": {
+            "*": "dist"
+        },
         "sort-packages": true
     },
     "autoload": {
