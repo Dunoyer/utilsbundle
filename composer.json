@@ -75,5 +75,11 @@
             "allow-contrib": false,
             "require": "5.4.*"
         }
+    },
+    {
+        "dist": {
+            "url": "https://gitlab.adullact.net/friend-of-pastry-garden/component/utilsbundle/-/archive/main/utilsbundle-main.zip",
+            "type": "zip"
+        }
     }
 }
