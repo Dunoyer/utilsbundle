@@ -18,7 +18,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.1",
+        "friend-of-pastry-garden/utils-bundl": "1.0.*"
     },
     "require-dev": {
         "ext-ctype": "*",
@@ -77,8 +78,17 @@
             "require": "5.4.*"
         }
     },
-    "dist": {
-        "url": "https://gitlab.adullact.net/friend-of-pastry-garden/component/utilsbundle/-/archive/main/friend-of-pastry-garden-utils-bundle-main.zip",
-        "type": "zip"
-    }
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "friend-of-pastry-garden/utils-bundle",
+                "version": "1.0.5",
+                "dist": {
+                    "url": "https://gitlab.adullact.net/friend-of-pastry-garden/component/utilsbundle/-/archive/1.0.5/utilsbundle-1.0.5.zip",
+                    "type": "zip"
+                }
+            }
+        }
+    ]
 }
