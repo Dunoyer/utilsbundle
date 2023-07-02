@@ -19,7 +19,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.1",
-        "friend-of-pastry-garden/utils-bundl": "1.0.*"
+        "friend-of-pastry-garden/utils-bundle": "1.0.*"
     },
     "require-dev": {
         "ext-ctype": "*",
