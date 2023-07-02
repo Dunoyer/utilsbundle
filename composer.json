@@ -5,18 +5,17 @@
     "keywords": ["SimpleHtml", "TestCase", "URL", "URI"],
     "homepage": "https://friend-of-pastry-garden.fr",
     "authors": [
-      {
-        "name": "Yannick ROUSSEL",
-        "email": "yannick.roussel@friend-of-pastry-garden.fr"
-      },
-      {
-        "name": "FOPG Community",
-        "homepage": "https://friend-of-pastry-garden.fr/contributors"
-      }
+        {
+            "name": "Yannick ROUSSEL",
+            "email": "yannick.roussel@friend-of-pastry-garden.fr"
+        },
+        {
+            "name": "FOPG Community",
+            "homepage": "https://friend-of-pastry-garden.fr/contributors"
+        }
     ],
     "license": "MIT",
     "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": ">=8.1"
     },
@@ -72,22 +71,16 @@
         "symfony/symfony": "*"
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.5"
+        },
         "symfony": {
             "allow-contrib": false,
             "require": "5.4.*"
         }
     },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "friend-of-pastry-garden/utils-bundle",
-                "version": "1.0.5",
-                "dist": {
-                    "url": "https://gitlab.adullact.net/friend-of-pastry-garden/component/utilsbundle/-/archive/1.0.5/utilsbundle-1.0.5.zip",
-                    "type": "zip"
-                }
-            }
-        }
-    ]
+    "dist": {
+        "url": "https://gitlab.adullact.net/friend-of-pastry-garden/component/utilsbundle/-/archive/main/friend-of-pastry-garden-utils-bundle-main.zip",
+        "type": "zip"
+    }
 }
